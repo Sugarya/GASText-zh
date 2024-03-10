@@ -7,7 +7,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--dataset",
-                           default="test",
+                           default="shopping",
                            type=str,
                            help="the dataset to be attacked")
     
@@ -21,10 +21,6 @@ def parse_arguments():
                            type=str,
                            help="the fill mask model")
     
-    parser.add_argument("--output",
-                           default="result",
-                           type=str,
-                           help="the result of attack")
 
     
     args = parser.parse_args()
