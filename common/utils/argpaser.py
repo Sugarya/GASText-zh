@@ -12,14 +12,14 @@ def parse_arguments():
                            help="the dataset to be attacked")
     
     parser.add_argument("--victim",
-                           default="bert-base-uncased-ag",
+                           default="bert-base-chinese",
                            type=str,
                            help="the victim to be attacked")
     
-    parser.add_argument("--encoder_decoder",
-                           default="bert-base",
-                           type=str,
-                           help="the fill mask model")
+    # parser.add_argument("--encoder_decoder",
+    #                        default="bert-base",
+    #                        type=str,
+    #                        help="the fill mask model")
     
 
     
