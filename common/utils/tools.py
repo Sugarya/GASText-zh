@@ -13,5 +13,5 @@ def show_log(content):
     @return：(, isValid)
 '''
 def filter_example(example):
-    label, text = example[0], example[1]
+    label, text = int(example[0]), example[1]
     return label, text

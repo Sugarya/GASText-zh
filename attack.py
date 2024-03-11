@@ -1,7 +1,7 @@
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from victim_model import HuggingFaceWrapper
-from common import parse_arguments
+from common import parse_arguments, AdvText
 from config import *
 from dataset import load_data
 from common import tools
@@ -19,7 +19,11 @@ if __name__ == '__main__':
     origin_examples = load_data(dataset_name)
     for index, example in enumerate(origin_examples):
         label, text = tools.filter_example(example)
-        probability, prob_label = victim_model.output_probability(text)
-        if label != prob_label: continue
+        probs, prob_label = victim_model.output_probability(text)
+        if label != prob_label: 
+            tools.show_log(f'skip example of {label}:{text}')
+            continue
 
-        # TODO 
+        adv_text = AdvText(label, text, probs)
+        tools.show_log(f'{adv_text}')
+
