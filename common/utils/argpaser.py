@@ -1,4 +1,5 @@
 import argparse
+from config import KEY
 
 
 Argument_Dict = {}
@@ -6,15 +7,10 @@ Argument_Dict = {}
 def parse_arguments():
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("--dataset",
-                           default="shopping",
-                           type=str,
-                           help="the dataset to be attacked")
-    
-    parser.add_argument("--victim",
-                           default="bert-base-chinese",
-                           type=str,
-                           help="the victim to be attacked")
+    parser.add_argument("--style",
+                           default = KEY.Chinanews,
+                           type = str,
+                           help = "the style to be attacked")
     
     # parser.add_argument("--encoder_decoder",
     #                        default="bert-base",

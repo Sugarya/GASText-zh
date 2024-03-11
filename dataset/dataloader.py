@@ -1,16 +1,16 @@
 
 import csv
-from config import DATASETS
-from common import show_log
+from config import KEY, MAPPING
+from common import tools
 
 
-def load_data(dataset_name):
-    file_path = "./dataset/src/%s" % DATASETS[dataset_name]
-    show_log('file_path = {}'.format(file_path))
+def load_data(style_name):
+    file_path = f'./dataset/src/{MAPPING[style_name].dataset}'
+    tools.show_log(f'file_path = {file_path}')
 
-    if dataset_name == "shopping":
+    if style_name == KEY.Shopping:
         examples = __read_corpus_of_online_shopping(file_path)
-    elif dataset_name == "chinanews":
+    elif style_name == KEY.Chinanews:
         examples = __read_corpus_of_chinanews(file_path)
     else:
         examples = __read_corpus(file_path)
