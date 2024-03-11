@@ -22,4 +22,4 @@ if __name__ == '__main__':
         probability, prob_label = victim_model.output_probability(text)
         if label != prob_label: continue
 
-        // TODO 
+        # TODO 
