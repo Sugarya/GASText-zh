@@ -41,7 +41,7 @@ class HuggingFaceWrapper(ABC):
 
     def output_probability(self, text_list):
         probability = self.__softmax(self.output_logits(text_list))
-        tools.show_log(f'HuggingFaceWrapper probability = {probability}')
+        # tools.show_log(f'HuggingFaceWrapper probability = {probability}')
         return probability
 
 

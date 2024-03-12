@@ -25,7 +25,7 @@ class Validator:
         updated_text = self.generate_text(adv_text)
         probs = self.victim_model.output_probability(updated_text)
         probs_difference = origin_probs[origin_label] - probs[origin_label]
-        tools.show_log(f'{probs_difference} | {origin_label} -- origin_probs = {origin_probs}, probs = {probs}')
+        # tools.show_log(f'{probs_difference} | {origin_label} -- origin_probs = {origin_probs}, probs = {probs}')
         return probs_difference
 
 

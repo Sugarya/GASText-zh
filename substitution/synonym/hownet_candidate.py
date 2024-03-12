@@ -10,7 +10,7 @@ class HownetBuilder:
 
     def __init__(self) -> None:
         self.__hownet_dict_advanced = OpenHowNet.HowNetDict()
-        self.__hownet_dict_advanced.initialize_babelnet_dict()
+        # self.__hownet_dict_advanced.initialize_babelnet_dict()
 
 
     def generate_synonyms(self, word:str, pos:str):
