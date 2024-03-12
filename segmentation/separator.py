@@ -3,9 +3,9 @@ from ltp import LTP
 import jieba
 import jieba.posseg as pseg
 import jieba.analyse
-from common import tools, AdvText
+from common import tools, AdvText, TokenUnit, TokenStyle, SubstituteUnit
 from enum import Enum
-
+from typing import List
 
 class SeparatorType(Enum):
     LTP = 1 #使用ltp分词库
@@ -18,6 +18,9 @@ class SeparatorType(Enum):
 class Separator:
 
     def __init__(self, type: SeparatorType) -> None:
+        # self.POS_FILTER = ('a', 'd', 'i', 'n', 'v', 'nl', 'vn','ad', 'vd')
+        self.POS_LTP_FILTER = ('a', 'b', 'd', 'n', 'v')
+
         if type == SeparatorType.LTP:
             self.__initial_ltp()
         elif type == SeparatorType.JIE_BA:
@@ -43,12 +46,20 @@ class Separator:
         pos=['r', 'v', 'nh', 'v', 'v', 'n', 'wp'], 
         ner=[('Nh', '汤姆')]
     '''
-    def splitByLTP(self, adv_text: AdvText):
-        text_line = adv_text.origin_text
-        output = self.ltp.pipeline(text_line, tasks=["cws", "pos", "ner"])
-        for index, token in enumerate(output.cws):
-            tools.show_log(f'{index}; {token} {output.pos[index]}')
-            
+    def splitByLTP(self, adv_text: AdvText) -> List[SubstituteUnit]:
+        substitute_units: List[SubstituteUnit] = []
+        output = self.ltp.pipeline(adv_text.origin_text, tasks=["cws", "pos", "ner"])
+        adv_text.token_units = [TokenUnit] * len(output.pos)
+
+        for index, pos in enumerate(output.pos):
+            token = output.cws[index]
+            if pos in self.POS_LTP_FILTER:
+                cur_token_unit = TokenUnit(index, token, TokenStyle.WORD_SUBSTITUTE)
+                adv_text.token_units[index] = cur_token_unit
+                substitute_units.append(cur_token_unit.substitute_unit)
+            else:
+                adv_text.token_units[index] = TokenUnit(index, token, TokenStyle.SILENCE)
+        return substitute_units
 
 
     def splitByJieba(self, adv_text: AdvText):
@@ -62,6 +73,3 @@ class Separator:
         seg_list = pseg.cut(adv_text.origin_text) #jieba 默认精确模式
         for index, (token, pos) in enumerate(seg_list):
             tools.show_log(f'{index}; {token}  {pos}')
-
-
-        

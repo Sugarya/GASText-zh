@@ -1,11 +1,14 @@
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from typing import List
 
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from victim_model import HuggingFaceWrapper
-from common import parse_arguments, AdvText
+from common import parse_arguments, AdvText, tools, SubstituteUnit
 from config import DEVICES, MAPPING
 from dataset import load_data
-from common import tools
 from segmentation import Separator, SeparatorType
+from validation import Validator
+from perturbation_search import Greedy
+from substitution import Substituter
 
 
 if __name__ == '__main__':
@@ -17,20 +20,30 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(victim_path, use_fast = True)
     victim_model = HuggingFaceWrapper(classifier, tokenizer)
 
-    # 初始化分词机
+    # 初始化分词器
     separator = Separator(SeparatorType.LTP)
+
+    # 初始化检验器
+    validator = Validator(victim_model)
+
+    # 初始化替代器
+    substituter = Substituter()
+
+    # 搜索
+    greedy = Greedy(validator, substituter)
     
 
     args_style = args.style
     origin_examples = load_data(args_style)
     for index, example in enumerate(origin_examples):
         label, text = tools.filter_example(example, args_style)
-        probs, prob_label = victim_model.output_probability(text)
-        if label != prob_label: 
-            tools.show_log(f'skip example of {label}:{text}')
+        adv_text = validator.generate_example_wrapper(label, text)
+        if adv_text is None:
             continue
-
-        adv_text = AdvText(label, text, probs)
-        separator.splitByLTP(adv_text)
+        
+        # 分词
+        substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
+        # 查找
+        greedy.search(substitute_units, adv_text)
 
 

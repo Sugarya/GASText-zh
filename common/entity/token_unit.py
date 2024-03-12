@@ -8,7 +8,7 @@ class TokenUnit(BaseEntity):
 
     def __init__(self, pos_in_text, origin_token, style) -> None:
         self.__common_init(pos_in_text, origin_token, style)
-        self.substitute_unit = SubstituteUnit(pos_in_text)
+        self.substitute_unit: SubstituteUnit = SubstituteUnit(pos_in_text, origin_token)
 
     def initial(self, pos_in_text, origin_token, style):
         self.__common_init(pos_in_text, origin_token, style)
@@ -32,24 +32,29 @@ class TokenUnit(BaseEntity):
 '''
 class SubstituteUnit((BaseEntity)):
 
-    def __init__(self, pos_in_text) -> None:
-        self.__common_init(pos_in_text)
+    def __init__(self, pos_in_text, origin_word) -> None:
+        self.__common_init(pos_in_text, origin_word)
+        self.state = SubstituteState.WORD_INITIAL
         # 同义候选词集
         self.candicates = []
 
     def initial(self, pos_in_text):
         self.__common_init(pos_in_text)
+        self.state = None
         self.candicates.clear()
 
-    def __common_init(self, pos_in_text):
+    def __common_init(self, pos_in_text, origin_word):
         self.pos_in_text = pos_in_text
+        self.origin_word = origin_word
         self.fragile_score = None
         # 替换前初始值
         self.exchange_inital_score = None
         # 替换中产生的当前最大脆弱值
         self.exchange_max_score = None
         # 替换中产生的最大脆弱值对应的替代词
-        self.candidate_replaced_word = None
+        self.candidate_max_word = None
+        # 替换中产生的当前替代词
+        self.exchange_word = None
 
 '''
     TokenUnit的类型
@@ -58,8 +63,13 @@ class TokenStyle(Enum):
     # 文本中不被替代的词语
     SILENCE = 1
     # 文本中，用来替代的
-    WORD_SYNONYM = 2
+    WORD_SUBSTITUTE = 2
+
+class SubstituteState(Enum):
+    WORD_INITIAL = 1
+
     # 文本中已经被替代的
-    WORD_SYNONYM_REPLACED = 3
+    WORD_REPLACED = 2
+
     # 文本中正在被替代的
-    WORD_SYNONYM_REPLACING = 4
+    WORD_REPLACING = 3
