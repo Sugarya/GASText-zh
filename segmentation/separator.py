@@ -54,11 +54,11 @@ class Separator:
         for index, pos in enumerate(output.pos):
             token = output.cws[index]
             if pos in self.POS_LTP_FILTER:
-                cur_token_unit = TokenUnit(index, token, TokenStyle.WORD_SUBSTITUTE)
+                cur_token_unit = TokenUnit(index, token, pos, TokenStyle.WORD_SUBSTITUTE)
                 adv_text.token_units[index] = cur_token_unit
                 substitute_units.append(cur_token_unit.substitute_unit)
             else:
-                adv_text.token_units[index] = TokenUnit(index, token, TokenStyle.SILENCE)
+                adv_text.token_units[index] = TokenUnit(index, token, pos, TokenStyle.SILENCE)
         return substitute_units
 
 

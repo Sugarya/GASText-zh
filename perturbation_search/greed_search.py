@@ -29,10 +29,24 @@ class Greedy:
         return substitute_units
     
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
+        # 1）按脆弱值排序
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
-        for substitue_unit in travel_substitutes:
-            tools.show_log(f'{substitue_unit.fragile_score} | replace {substitue_unit.origin_word} in {substitue_unit.pos_in_text}')
 
-        
-        
+        for index in range(len(travel_substitutes)):
+            substitue_unit = travel_substitutes[index]
+            origin_word, origin_pos = substitue_unit.origin_word, substitue_unit.origin_pos
+            # tools.show_log(f'{substitue_unit.fragile_score} | replace {substitue_unit.origin_word} in {substitue_unit.pos_in_text}')
+            
+            # 2）生成替代词
+            substitue_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
+            if not substitue_unit.candicates:
+                # 没有同义词集，从列表中删去
+                tools.show_log(f'****{substitue_unit.origin_word} 没有hownet同义词')
+                travel_substitutes.remove(substitue_unit)
+                continue
+            
+            # 3）替换--遍历同义词集，把让模型概率差值最大的词去替代原始文本相同位置的词
+
+
+
         pass
