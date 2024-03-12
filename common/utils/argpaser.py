@@ -8,14 +8,14 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--style",
-                           default = KEY.Chinanews,
+                           default = KEY.Shopping,
                            type = str,
                            help = "the style to be attacked")
     
-    # parser.add_argument("--encoder_decoder",
-    #                        default="bert-base",
-    #                        type=str,
-    #                        help="the fill mask model")
+    parser.add_argument("--split",
+                           default = "ltp",
+                           type = str,
+                           help = "segmentation")
     
 
     

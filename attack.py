@@ -5,6 +5,7 @@ from common import parse_arguments, AdvText
 from config import DEVICES, MAPPING
 from dataset import load_data
 from common import tools
+from segmentation import Separator, SeparatorType
 
 
 if __name__ == '__main__':
@@ -16,6 +17,10 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(victim_path, use_fast = True)
     victim_model = HuggingFaceWrapper(classifier, tokenizer)
 
+    # 初始化分词机
+    separator = Separator(SeparatorType.LTP)
+    
+
     args_style = args.style
     origin_examples = load_data(args_style)
     for index, example in enumerate(origin_examples):
@@ -26,6 +31,6 @@ if __name__ == '__main__':
             continue
 
         adv_text = AdvText(label, text, probs)
-        # tools.show_log(f'{adv_text}')
+        separator.splitByLTP(adv_text)
 
 

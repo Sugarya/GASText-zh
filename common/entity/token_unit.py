@@ -55,13 +55,11 @@ class SubstituteUnit((BaseEntity)):
     TokenUnit的类型
 '''
 class TokenStyle(Enum):
-    # 文本的非词语，如标点符号
-    SYMBOL = 1
     # 文本中不被替代的词语
-    WORD_SILENCE = 2
+    SILENCE = 1
     # 文本中，用来替代的
-    WORD_SYNONYM = 3
+    WORD_SYNONYM = 2
     # 文本中已经被替代的
-    WORD_SYNONYM_REPLACED = 4
+    WORD_SYNONYM_REPLACED = 3
     # 文本中正在被替代的
-    WORD_SYNONYM_REPLACING = 5
+    WORD_SYNONYM_REPLACING = 4
