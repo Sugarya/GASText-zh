@@ -16,9 +16,13 @@ class Validator:
         sim_score = self.__sim_measurer.compute_cos_similarity(origin_text, adversary_candidate_text)
         return sim_score
 
+    def is_attack_success(self, real_label:int, adversary_candidate_text:str) -> bool:
+        probability = self.__victim_model.output_probability(adversary_candidate_text)
+        prob_label = np.argmax(probability)
+        return prob_label != real_label, probability
 
     # 当数据合理时，生成AdvText实例
-    def generate_example_wrapper(self, label, text) -> AdvText:
+    def generate_example_wrapper(self, label:int, text:str) -> AdvText:
         probability = self.__victim_model.output_probability(text)
         prob_label = np.argmax(probability)
         if label != prob_label: 
