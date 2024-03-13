@@ -19,17 +19,17 @@ if __name__ == '__main__':
     tokenizer = AutoTokenizer.from_pretrained(victim_path, use_fast = True)
     victim_model = HuggingFaceWrapper(classifier, tokenizer)
 
-    # 初始化分词器
-    separator = Separator(SeparatorType.LTP)
-
     # 初始化检验器
     validator = Validator(victim_model)
 
     # 初始化替代器
-    substituter = Substituter(SubstituteType.SEMEME)
+    substituter = Substituter(SubstituteType.CWORDATTACKER)
 
     # 搜索
     greedy = Greedy(validator, substituter)
+
+    # 初始化分词器
+    separator = Separator(SeparatorType.LTP)
     
 
     args_style = args.style

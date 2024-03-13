@@ -1,10 +1,21 @@
 import numpy as np
 from common import tools, AdvText, TokenStyle, SubstituteState, HuggingFaceWrapper
+from .similarity_measure import SimMeasurer
 
 class Validator:
 
     def __init__(self, victim_model: HuggingFaceWrapper) -> None:
         self.__victim_model = victim_model
+        self.__sim_measurer = SimMeasurer()
+
+
+    '''
+        计算两个句子的cosin的语义相似值
+    '''
+    def cosine_similarity(self, origin_text:str, adversary_candidate_text:str):
+        sim_score = self.__sim_measurer.compute_cos_similarity(origin_text, adversary_candidate_text)
+        return sim_score
+
 
     # 当数据合理时，生成AdvText实例
     def generate_example_wrapper(self, label, text) -> AdvText:

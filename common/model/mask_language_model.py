@@ -7,7 +7,7 @@ class BertMaskedModelWrapper:
     MASK_TOKEN = '[MASK]'
 
     def __init__(self) -> None:
-        model_name = MASK_MODEL[KEY.Bert] # "bert-base-chinese"
+        model_name = MODEL_POOL[KEY.Masked_Bert] # "bert-base-chinese"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForMaskedLM.from_pretrained(model_name).to(DEVICES[1])
         self.__unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer) 

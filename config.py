@@ -15,15 +15,17 @@ class ConfigConstant:
 class KEY:
     Shopping = 'bert-shopping'
     Chinanews = 'roberta-chinanews'
-    Bert = 'bert'
+    Masked_Bert = 'bert'
+    SentenceSimilarity = 'text2vec'
 
 MAPPING = {
     KEY.Shopping: ConfigConstant('partly_online_shopping_cats.csv','Raychanan/bert-base-chinese-FineTuned-Binary-Best'),
     KEY.Chinanews: ConfigConstant('partly_chinanews.csv', 'uer/roberta-base-finetuned-chinanews-chinese'),
 }
 
-MASK_MODEL = {
-    KEY.Bert: 'google-bert/bert-base-chinese'
+MODEL_POOL = {
+    KEY.Masked_Bert: 'google-bert/bert-base-chinese',
+    KEY.SentenceSimilarity: 'shibing624/text2vec-base-chinese-sentence'
 }
 
 
