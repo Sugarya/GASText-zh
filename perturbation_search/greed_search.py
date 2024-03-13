@@ -33,22 +33,23 @@ class Greedy:
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
         for index in range(len(travel_substitutes)):
-            if index >= 3: break
-            substitue_unit = travel_substitutes[index]
-            origin_word, origin_pos = substitue_unit.origin_word, substitue_unit.origin_pos
+            if index >= 1: break
+            substitute_unit = travel_substitutes[index]
+            origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             # tools.show_log(f'{substitue_unit.fragile_score} | replace {substitue_unit.origin_word} in {substitue_unit.pos_in_text}')
             
             # 2）TODO 确定一种替代方式，如使用CWorkAttacker生成替代词
-            # substitue_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
+            substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
             # 
-            substitue_unit.candicates = self.__substituter.generate_masked_candidates(substitue_unit, adv_text)
-            if not substitue_unit.candicates:
+            # substitue_unit.candicates = self.__substituter.generate_masked_candidates(substitue_unit, adv_text)
+            if not substitute_unit.candicates:
                 # 没有同义词集，从列表中删去
-                tools.show_log(f'****{substitue_unit.origin_word} 没有hownet同义词')
-                travel_substitutes.remove(substitue_unit)
+                tools.show_log(f'****{substitute_unit.origin_word} 没有hownet同义词')
+                travel_substitutes.remove(substitute_unit)
                 continue
             
             # 3）替换--遍历同义词集，把让模型概率差值最大的词去替代原始文本相同位置的词
+
 
 
 

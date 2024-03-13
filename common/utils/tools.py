@@ -1,7 +1,7 @@
 
 from config import Pattern, KEY
 from common import AdvText, TokenStyle, SubstituteState
-
+from nltk.corpus import wordnet as wn
 
 
 def show_log(content):
@@ -53,7 +53,18 @@ def generate_text(adv_text: AdvText) -> str:
     text = ''.join(display_list)
     return text
     
-
+# def to_hownet_pos(pos:str):
+#     upper_pos = pos.upper()
+#     if upper_pos.startswith('J') or upper_pos.startswith('A'):
+#         return wn.ADJ
+#     elif upper_pos.startswith('V'):
+#         return wn.VERB
+#     elif upper_pos.startswith('N'):
+#         return wn.NOUN
+#     elif upper_pos.startswith('R'):
+#         return wn.ADV
+#     else:
+#         return None
 
 def similary_words(word1: str, word2: str) -> float:
 

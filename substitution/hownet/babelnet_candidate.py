@@ -6,11 +6,14 @@ class LANGUAGE:
     ZH = 'zh'
     EN = 'en'
 
-class HownetBuilder:
+'''
+    BabelNet同义词集
+'''
+class BabelNetBuilder:
 
     def __init__(self) -> None:
         self.__hownet_dict_advanced = OpenHowNet.HowNetDict()
-        # self.__hownet_dict_advanced.initialize_babelnet_dict()
+        self.__hownet_dict_advanced.initialize_babelnet_dict()
 
 
     def synonyms(self, word:str, pos:str):
@@ -18,7 +21,6 @@ class HownetBuilder:
         tools.show_log(f'synonym_list = {synonym_list}')
         return synonym_list
 
-    
     
     '''
         pos: Can be set to a/v/n/r

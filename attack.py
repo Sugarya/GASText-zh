@@ -7,7 +7,7 @@ from dataset import load_data
 from segmentation import Separator, SeparatorType
 from validation import Validator
 from perturbation_search import Greedy
-from substitution import Substituter
+from substitution import Substituter, SubstituteType
 
 
 if __name__ == '__main__':
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     validator = Validator(victim_model)
 
     # 初始化替代器
-    substituter = Substituter()
+    substituter = Substituter(SubstituteType.SEMEME)
 
     # 搜索
     greedy = Greedy(validator, substituter)
