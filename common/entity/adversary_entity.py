@@ -3,7 +3,7 @@ from .base_entity import BaseEntity
 '''
     收集评价指标的信息
 '''
-class AdversaryEntity(BaseEntity):
+class AdversaryInfo(BaseEntity):
 
     def __init__(self, origin_text, origin_accurary) -> None:
         self.origin_text = origin_text

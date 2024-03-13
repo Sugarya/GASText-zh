@@ -1,5 +1,5 @@
 
-from .adversary_entity import AdversaryEntity
+from .adversary_entity import AdversaryInfo
 from .base_entity import BaseEntity
 from .token_unit import TokenUnit
 from typing import List
@@ -15,7 +15,7 @@ class AdvText(BaseEntity):
         self.origin_probs = origin_probs
 
         # 实时计算中，存储评价指标相关的信息
-        self.adversary_entity = AdversaryEntity(origin_text, origin_probs[origin_label])
+        self.adversary_entity = AdversaryInfo(origin_text, origin_probs[origin_label])
         # 原始文本的每个token单元构成的列表
         self.token_units: List[TokenUnit] = None
 

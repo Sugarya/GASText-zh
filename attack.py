@@ -1,8 +1,7 @@
 from typing import List
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from victim_model import HuggingFaceWrapper
-from common import parse_arguments, AdvText, tools, SubstituteUnit
+from common import parse_arguments, AdvText, tools, SubstituteUnit, HuggingFaceWrapper
 from config import DEVICES, MAPPING
 from dataset import load_data
 from segmentation import Separator, SeparatorType

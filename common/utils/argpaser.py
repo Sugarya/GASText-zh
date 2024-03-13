@@ -17,7 +17,11 @@ def parse_arguments():
                            type = str,
                            help = "segmentation")
     
-
+    # parser.add_argument("--masked",
+    #                        default = KEY.Bert,
+    #                        type = str,
+    #                        help = "mask language model")
+    
     
     args = parser.parse_args()
 

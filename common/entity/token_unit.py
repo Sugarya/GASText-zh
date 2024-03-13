@@ -22,11 +22,8 @@ class TokenUnit(BaseEntity):
         self.origin_pos = origin_pos
         # TokenUnit实例的类型
         self.style = style
+
         
-        # 当前的token，用来恢复文本的
-        self.token = origin_token
-        # # 若该单元处在替换中，候选同义词语赋值而来，用于恢复文本
-        # self.exchange_token = origin_token
 
 '''
     语义单元实体类
@@ -49,15 +46,18 @@ class SubstituteUnit((BaseEntity)):
         self.origin_word = origin_word
         self.origin_pos = origin_pos
 
+        # 脆弱值
         self.fragile_score = None
-        # 替换前初始值
-        self.exchange_inital_score = None
-        # 替换中产生的当前最大脆弱值
-        self.exchange_max_score = None
-        # 替换中产生的最大脆弱值对应的替代词
-        self.candidate_max_word = None
-        # 替换中产生的当前替代词
+
+        # 替换前初始的概率值
+        self.exchange_inital_probability = None
+        # 替换过程，记录下当前最大的概率值
+        self.exchange_max_probability = None
+        # 替换过程，产生的当前替代词
         self.exchange_word = None
+        # 替换过程，产生的最大概率值对应的替代词
+        self.candidate_max_word = None
+       
 
 '''
     TokenUnit的类型

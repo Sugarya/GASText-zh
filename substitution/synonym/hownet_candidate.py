@@ -13,7 +13,7 @@ class HownetBuilder:
         # self.__hownet_dict_advanced.initialize_babelnet_dict()
 
 
-    def generate_synonyms(self, word:str, pos:str):
+    def synonyms(self, word:str, pos:str):
         synonym_list = self.__synonyms(word, pos)
         tools.show_log(f'synonym_list = {synonym_list}')
         return synonym_list

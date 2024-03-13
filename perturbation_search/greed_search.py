@@ -38,8 +38,10 @@ class Greedy:
             origin_word, origin_pos = substitue_unit.origin_word, substitue_unit.origin_pos
             # tools.show_log(f'{substitue_unit.fragile_score} | replace {substitue_unit.origin_word} in {substitue_unit.pos_in_text}')
             
-            # 2）生成替代词
-            substitue_unit.candicates = self.__substituter.cword_attacker_transform(origin_word)
+            # 2）TODO 确定一种替代方式，如使用CWorkAttacker生成替代词
+            # substitue_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
+            # 
+            substitue_unit.candicates = self.__substituter.generate_masked_candidates(substitue_unit, adv_text)
             if not substitue_unit.candicates:
                 # 没有同义词集，从列表中删去
                 tools.show_log(f'****{substitue_unit.origin_word} 没有hownet同义词')

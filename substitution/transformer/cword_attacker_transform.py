@@ -14,7 +14,7 @@ class CWordAttackerTransformer:
     def __init__(self) -> None:
         self.__converter = opencc.OpenCC('s2t.json')
 
-    def generate_candidate(self, word:str) -> str:
+    def candidate(self, word:str) -> str:
         num = random.randint(0,3)
         candidate = word
         if num == 0:
