@@ -40,13 +40,14 @@ if __name__ == '__main__':
         adv_text = validator.generate_example_wrapper(label, text)
         if adv_text is None:
             tools.show_log(f'origin_examples: {index} Round, continue')
-            tools.show_log(f'             ------------------------------------------------------------------------------------')
+            tools.show_log(f'             ----------------------------------------------------')
             continue
         
         # 分词
         substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
         # 扰动贪心查找
-        attack_success = greedy.search(substitute_units, adv_text)
+        success = greedy.search(substitute_units, adv_text)
         # 计算评价指标
-        tools.show_log(f'             ------------------------------------------------------------------------------------')
-
+        tools.show_log(f'             -----------------------------------------------------')
+        tools.show_log(f'adversary_info = {adv_text.adversary_info}')
+        tools.show_log(f'------------------------------------------------------------------------------------')

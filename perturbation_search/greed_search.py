@@ -57,13 +57,15 @@ class Greedy:
             tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.greedy_score}')
             attack_succees = self.operate_substitute(substitute_unit, adv_text)
             if attack_succees:
+                self.__validator.collect_adversary_info(adv_text)
                 return True
         
+        self.__validator.collect_adversary_info(adv_text)
         return False
 
     '''
         处理单个语义单元，共有3个环节：初始化，逐一替换和检验，产生有效替代
-        return: 对抗样本是否找到
+        return: 当前substitute内，是否能找到对抗样本
     '''
     def operate_substitute(self, substitute: SubstituteUnit, adv_text:AdvText) -> bool:
         # 环节1) SubstituteUnit初始化
@@ -100,7 +102,10 @@ class Greedy:
                 adv_text.greedy_score = cur_greedy_score
                 tools.show_log(f'**************ATTACK SUCCESS**************')
                 # 2.7 收集评价指标信息
-                self.__collect_adversary_info(adv_text)
+                adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
+                adv_text.adversary_info.adversary_text = latest_candidate_text
+                adv_text.adversary_info.adversary_label = prob_label
+                adv_text.adversary_info.attack_success = True
                 return True 
             else:
                 if cur_greedy_score <= substitute.initial_greedy_score:
@@ -117,6 +122,10 @@ class Greedy:
                 tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
                 tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_greedy_text}')
                 
+                # 2.7 收集评价指标信息
+                adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
+                adv_text.adversary_info.adversary_text = latest_candidate_text
+                adv_text.adversary_info.adversary_label = prob_label
 
         # 环节3）判断候选词是否有效，检验约束条件，更新状态
         # 3.1 是否有出现了有效候词替代原始文本
@@ -147,9 +156,3 @@ class Greedy:
     '''
     def __greedy_selection_score(self, origin_probs: List[float], candidate_probs:List[float], label:int) -> float:
         return origin_probs[label] - candidate_probs[label]
-
-
-    # TODO 评价指标信息收集
-    def __collect_adversary_info(self, adv_text: AdvText):
-
-        pass

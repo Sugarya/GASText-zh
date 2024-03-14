@@ -23,7 +23,7 @@ def filter_example(example, style):
     生成当前最新的文本
 '''
 def generate_latest_text(adv_text: AdvText) -> str:
-    display_list = [None] * len(adv_text.token_units)
+    display_list = [None] * adv_text.token_count
     for index, token_unit in enumerate(adv_text.token_units):                
         if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
             if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:

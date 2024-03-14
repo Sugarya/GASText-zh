@@ -49,10 +49,11 @@ class Separator:
     def splitByLTP(self, adv_text: AdvText) -> List[SubstituteUnit]:
         substitute_units: List[SubstituteUnit] = []
         output = self.ltp.pipeline(adv_text.origin_text, tasks=["cws", "pos", "ner"])
-        adv_text.token_units = [TokenUnit] * len(output.pos)
+        adv_text.token_count = len(output.cws)
+        adv_text.token_units = [TokenUnit] * adv_text.token_count
 
-        for index, pos in enumerate(output.pos):
-            token = output.cws[index]
+        for index, token in enumerate(output.cws):
+            pos = output.pos[index]
             if pos in self.POS_LTP_FILTER:
                 cur_token_unit = TokenUnit(index, token, pos, TokenStyle.WORD_SUBSTITUTE)
                 adv_text.token_units[index] = cur_token_unit

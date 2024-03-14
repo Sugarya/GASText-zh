@@ -1,5 +1,5 @@
 import numpy as np
-from common import tools, AdvText, TokenStyle, SubstituteState, HuggingFaceWrapper
+from common import tools, AdvText, HuggingFaceWrapper, TokenStyle, SubstituteState
 from .similarity_measure import SimMeasurer
 from typing import List, Tuple
 
@@ -13,7 +13,7 @@ class Validator:
     '''
         计算两个句子的cosin的语义相似值
     '''
-    def cosine_similarity(self, origin_text:str, adversary_candidate_text:str):
+    def cosine_similarity(self, origin_text:str, adversary_candidate_text:str) -> float:
         sim_score = self.__sim_measurer.compute_cos_similarity(origin_text, adversary_candidate_text)
         return sim_score
 
@@ -43,4 +43,22 @@ class Validator:
         # tools.show_log(f'{probs_difference} | {origin_label} -- origin_probs = {origin_probs}, probs = {probs}')
         return probs_difference
 
-    
+    # 当搜索结束时（对抗攻击可能成功，可能失败），收集评价指标信息
+    def collect_adversary_info(self, adv_text: AdvText):
+        # 1 收集替换词数量，perturbed_number
+        adversary_info = adv_text.adversary_info
+        adversary_info.perturbed_token_number = len(list(filter(lambda token_unit: 
+                token_unit.style == TokenStyle.WORD_SUBSTITUTE and token_unit.substitute_unit.state == SubstituteState.WORD_REPLACED
+                        ,adv_text.token_units)))
+        
+        # 2 收集替换词的总数
+        adversary_info.total_token_number = adv_text.token_count
+
+        # 3 收集对抗样本和原始文本的相似度
+        adversary_info.similarity = self.cosine_similarity(adversary_info.origin_text, adversary_info.adversary_text)
+
+        # 3 收集查询次数
+        adversary_info.query_times = self.__victim_model.get_query_times()
+        self.__victim_model.initial_query_time()
+        
+       

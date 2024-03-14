@@ -1,4 +1,7 @@
 
+'''
+    支持打印对象实例
+'''
 class BaseEntity:
 
     def _gather_attrs(self):

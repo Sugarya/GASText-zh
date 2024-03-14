@@ -1,11 +1,11 @@
+from typing import List
 import numpy as np
-from abc import ABC, abstractmethod
 import torch
 from common import tools
-from typing import List
+from .base_model_wrapper import *
 
 
-class HuggingFaceWrapper(ABC):
+class HuggingFaceWrapper(BaseModel):
 
     def __init__(self, model, tokenizer):
         super(HuggingFaceWrapper, self).__init__()
@@ -15,6 +15,13 @@ class HuggingFaceWrapper(ABC):
 
         self.unk_token = self._tokenizer.unk_token
         self.sep_token = self._tokenizer.sep_token
+
+    '''
+        转为概率值
+    '''
+    def __softmax(self, x):
+        exp_x = np.exp(x)
+        return exp_x / np.sum(exp_x)
 
     def __output_logits(self, text_list):
         text = []
@@ -37,6 +44,7 @@ class HuggingFaceWrapper(ABC):
         with torch.no_grad():    
             outputs = self._model(**inputs)
         logits =  np.concatenate(outputs.logits.cpu().numpy(), axis = 0)
+        self.plus_one_query_time()
         # tools.show_log(f'HuggingFaceWrapper logits = {logits}')
         return logits
 
@@ -45,9 +53,3 @@ class HuggingFaceWrapper(ABC):
         # tools.show_log(f'HuggingFaceWrapper probs = {probs}')
         return probs
 
-    '''
-        转为概率值
-    '''
-    def __softmax(self, x):
-        exp_x = np.exp(x)
-        return exp_x / np.sum(exp_x)
