@@ -1,2 +1,2 @@
 from .huggingface_wrapper import *
-from .mask_language_model import *
+from .masked_language_model import *

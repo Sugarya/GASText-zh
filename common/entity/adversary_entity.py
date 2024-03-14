@@ -7,6 +7,8 @@ class AdversaryInfo(BaseEntity):
 
     def __init__(self, origin_text, origin_accurary) -> None:
         self.origin_text = origin_text
+
+        # 原始文本的标签的概率值
         self.origin_accurary = origin_accurary
         
         # 查询模型的次数

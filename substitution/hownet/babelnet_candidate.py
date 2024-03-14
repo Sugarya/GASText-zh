@@ -18,7 +18,6 @@ class BabelNetBuilder:
 
     def synonyms(self, word:str, pos:str):
         synonym_list = self.__synonyms(word, pos)
-        tools.show_log(f'synonym_list = {synonym_list}')
         return synonym_list
 
     
@@ -29,8 +28,12 @@ class BabelNetBuilder:
     def __synonyms(self, lemma:str, word_pos:str):
         syn_list = []
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
-            synonyms = self.__hownet_dict_advanced.get_synset(lemma, pos = word_pos, language = LANGUAGE.ZH)
+            synonyms = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH)
             tools.show_log(f'synonyms = {synonyms}')
             for syn in synonyms:
-                syn_list.extend(syn.zh_synonyms)
-        return list(set(syn_list))
+                if syn.pos == word_pos:
+                    syn_list.extend(syn.zh_synonyms)
+        syn_list = list(set(syn_list))            
+        tools.show_log(f'syn_list of {word_pos} = {syn_list}')      
+        return syn_list
+    

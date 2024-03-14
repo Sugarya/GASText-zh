@@ -2,6 +2,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 import torch
 from common import tools
+from typing import List
 
 
 class HuggingFaceWrapper(ABC):
@@ -15,7 +16,7 @@ class HuggingFaceWrapper(ABC):
         self.unk_token = self._tokenizer.unk_token
         self.sep_token = self._tokenizer.sep_token
 
-    def output_logits(self, text_list):
+    def __output_logits(self, text_list):
         text = []
         if isinstance(text_list, str):
             text.append(text_list)
@@ -39,12 +40,14 @@ class HuggingFaceWrapper(ABC):
         # tools.show_log(f'HuggingFaceWrapper logits = {logits}')
         return logits
 
-    def output_probability(self, texts):
-        probability = self.__softmax(self.output_logits(texts))
-        # tools.show_log(f'HuggingFaceWrapper probability = {probability}')
-        return probability
+    def output_probs(self, texts) -> List[str]:
+        probs = self.__softmax(self.__output_logits(texts))
+        # tools.show_log(f'HuggingFaceWrapper probs = {probs}')
+        return probs
 
-
+    '''
+        转为概率值
+    '''
     def __softmax(self, x):
         exp_x = np.exp(x)
         return exp_x / np.sum(exp_x)

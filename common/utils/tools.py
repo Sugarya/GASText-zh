@@ -2,12 +2,12 @@
 from config import Pattern, KEY
 from common import AdvText, TokenStyle, SubstituteState
 from nltk.corpus import wordnet as wn
+from typing import List
 
 
 def show_log(content):
-    if Pattern.isDebug:
+    if Pattern.IsDebug:
         print(content)
-
 
 '''
     @example：数据集文件的一行内容
@@ -29,7 +29,7 @@ def generate_latest_text(adv_text: AdvText) -> str:
             if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
                 display_list[index] = token_unit.substitute_unit.exchange_word
             elif token_unit.substitute_unit.state == SubstituteState.WORD_REPLACED:
-                display_list[index] = token_unit.substitute_unit.candidate_max_word
+                display_list[index] = token_unit.substitute_unit.exchange_max_greedy_word
             else:
                 display_list[index] = token_unit.origin_token 
         else:
