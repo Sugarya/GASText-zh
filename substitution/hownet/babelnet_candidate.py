@@ -24,16 +24,19 @@ class BabelNetBuilder:
     '''
         pos: Can be set to a/v/n/r
         使用单词原型,否则babelnet无法识别
+        TODO 需要性能优化
     '''
     def __synonyms(self, lemma:str, word_pos:str):
-        syn_list = []
+        candidate_list = []
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
-            synonyms = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH)
-            tools.show_log(f'synonyms = {synonyms}')
-            for syn in synonyms:
-                if syn.pos == word_pos:
-                    syn_list.extend(syn.zh_synonyms)
-        syn_list = list(set(syn_list))            
-        tools.show_log(f'syn_list of {word_pos} = {syn_list}')      
-        return syn_list
+            synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH)
+            tools.show_log(f'synonyms_list = {synonyms_list}')
+            for synonyms in synonyms_list:
+                if synonyms.pos == word_pos:
+                    for syn_zh in synonyms.zh_synonyms:
+                        if syn_zh not in candidate_list:
+                            candidate_list.append(syn_zh)
+         
+        tools.show_log(f'BabelNetBuilder ｜ candidate_list of {word_pos} = {candidate_list}')      
+        return candidate_list
     
