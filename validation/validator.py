@@ -27,7 +27,7 @@ class Validator:
         probs = self.__victim_model.output_probs(text)
         prob_label = np.argmax(probs)
         if label != prob_label: 
-            tools.show_log(f'********************** skip example of {label}:{text}')
+            tools.show_log(f'**********************label(origin->prob): {label}-->{prob_label}, so skip example of: {text}')
             return None
         return AdvText(label, text, probs)
 

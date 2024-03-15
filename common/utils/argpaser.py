@@ -8,7 +8,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     
     parser.add_argument("--style",
-                           default = KEY.Shopping,
+                           default = KEY.Chinanews,
                            type = str,
                            help = "the style to be attacked")
     
