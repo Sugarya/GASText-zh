@@ -18,7 +18,7 @@ def filter_example(example, style) -> Tuple[int, str]:
     if style == KEY.Chinanews:
         label, text = int(example[0]) - 1, f'{example[1]}{example[2]}'
     else:
-        label, text = int(example[0]), example[1]    
+        label, text = int(example[0]), f'{example[1] }'   
     return label, text
 
 '''

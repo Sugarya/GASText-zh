@@ -8,6 +8,7 @@ from segmentation import Separator, SeparatorType
 from validation import Validator
 from perturbation_search import Greedy
 from substitution import Substituter
+from evaluation import Evaluator
 
 
 if __name__ == '__main__':
@@ -30,10 +31,14 @@ if __name__ == '__main__':
 
     # 初始化分词器
     separator = Separator(SeparatorType.LTP)
+
+    # 初始化评价器
+    evaluator = Evaluator()
     
 
     args_style = args.style
     origin_examples = load_data(args_style)
+    evaluator.set_origin_example_count(len(origin_examples))
     for index, example in enumerate(origin_examples):
         tools.show_log(f'origin_examples: {index} Round')
         label, text = tools.filter_example(example, args_style)
@@ -47,7 +52,11 @@ if __name__ == '__main__':
         substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
         # 扰动贪心查找
         success = greedy.search(substitute_units, adv_text)
-        # 计算评价指标
         tools.show_log(f'             -----------------------------------------------------')
+        # 收集评价指标信息
         tools.show_log(f'adversary_info = {adv_text.adversary_info}')
+        evaluator.add(adv_text.adversary_info)
         tools.show_log(f'------------------------------------------------------------------------------------')
+
+    # 计算实验指标
+    evaluator.compute()

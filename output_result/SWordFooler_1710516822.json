@@ -1,0 +1,38 @@
+{
+    "ave_origin_accurary": 0.8275522291660309,
+    "ave_adversary_accurary": 0.30241620168089867,
+    "ave_accurary_reduction": 0.5251360274851322,
+    "attack_rate": 1.0,
+    "ave_perturbated_rate": 0.03418803418803419,
+    "ave_sim_score": 0.9509568512439728,
+    "ave_query_times": 51.5
+}
+
+The detail of examples are following：
+
+[
+    {
+        "attack_success": true,
+        "adversary_label": 0,
+        "origin_text": "看完书已经是深夜。被书中作者对战争给阿富汗人带来的伤害的描述所震撼。也为主角和他兄弟仆人之间的友谊所震撼，能深深的感受到主角心里的愧疚。书中好多个残忍的场景一直在脑中回旋着，突然觉得生长在中国，特别能在改革开放后的成才是非常幸运的。书中的高潮部分跌宕起伏，看的是惊心动魄的，也对阿富汗曾经的部分历史和灾难有所了解。打算再买一本三杯茶。",
+        "adversary_text": "看完书已经是深夜。被书中作者对斗争给阿富汗人带来的伤害的描述所震撼。也为主角和他兄弟仆人之间的友谊所震撼，能深深的感受到主角心里的愧疚。书中好多个残忍的场景一直在脑中回旋着，突然觉得生长在中国，特别能在改革开放后的成才是非常福的。书中的高潮部分跌宕起伏，看的是惊心动魄的，也对阿富汗曾经的部分历史和灾难有所了解。打算再买一本三杯茶。",
+        "origin_accurary": 0.6744738221168518,
+        "adversary_accurary": 0.48490890860557556,
+        "text_token_count": 113,
+        "perturbated_token_count": 2,
+        "similarity": 0.9983921647071838,
+        "query_times": 87
+    },
+    {
+        "attack_success": true,
+        "adversary_label": 1,
+        "origin_text": "\"手机系统差",
+        "adversary_text": "\"德律风系统劣",
+        "origin_accurary": 0.98063063621521,
+        "adversary_accurary": 0.11992349475622177,
+        "text_token_count": 4,
+        "perturbated_token_count": 2,
+        "similarity": 0.9035215377807617,
+        "query_times": 16
+    }
+]
