@@ -90,42 +90,35 @@ class Greedy:
             cur_greedy_score = self.__greedy_selection_score(adv_text.origin_probs, candidate_probs, adv_text.origin_label)
             tools.show_log(f'**************candidate={candidate}, label(origin->prob): {adv_text.origin_label}->{prob_label}, cur_greedy_score = {cur_greedy_score}')
             
-            # 2.4 判断当前候选词有效性,是否为对抗样本
+            # 2.4 判断当前候选词有效性,如果不是对抗样本
             adversary_success = (prob_label != adv_text.origin_label)
+            if not adversary_success and cur_greedy_score <= substitute.initial_greedy_score:
+                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.initial_greedy_score}initial_greedy_score')
+                continue
+            if not adversary_success and cur_greedy_score <= substitute.exchange_max_greedy_score:
+                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.exchange_max_greedy_score}exchange_max_greedy_score')
+                continue
+
+            # 2.5 更新substitute unit
+            substitute.exchange_max_greedy_score = cur_greedy_score
+            substitute.exchange_max_greedy_word = candidate
+            substitute.exchange_max_greedy_text = latest_candidate_text
+            tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
+            tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_greedy_text}')
+            
+            # 2.6 收集评价指标信息
+            adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
+            adv_text.adversary_info.adversary_text = latest_candidate_text
+            adv_text.adversary_info.adversary_label = prob_label
+            
+            # 2.7 如果对抗样本成功
             if adversary_success:
-                # 更新substitute信息
-                substitute.exchange_max_greedy_score = cur_greedy_score
-                substitute.exchange_max_greedy_word = candidate
-                substitute.exchange_max_greedy_text = latest_candidate_text
                 substitute.state = SubstituteState.WORD_REPLACED
                 # 更新全局信息
                 adv_text.greedy_score = cur_greedy_score
-                tools.show_log(f'**************ATTACK SUCCESS**************')
-                # 2.7 收集评价指标信息
-                adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
-                adv_text.adversary_info.adversary_text = latest_candidate_text
-                adv_text.adversary_info.adversary_label = prob_label
                 adv_text.adversary_info.attack_success = True
+                tools.show_log(f'**************ATTACK SUCCESS**************')
                 return True 
-            else:
-                if cur_greedy_score <= substitute.initial_greedy_score:
-                    tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.initial_greedy_score}initial_greedy_score')
-                    continue
-                if cur_greedy_score <= substitute.exchange_max_greedy_score:
-                    tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.exchange_max_greedy_score}exchange_max_greedy_score')
-                    continue
-
-                # 2.5 更新substitute unit信息
-                substitute.exchange_max_greedy_score = cur_greedy_score
-                substitute.exchange_max_greedy_word = candidate
-                substitute.exchange_max_greedy_text = latest_candidate_text
-                tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
-                tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_greedy_text}')
-                
-                # 2.7 收集评价指标信息
-                adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
-                adv_text.adversary_info.adversary_text = latest_candidate_text
-                adv_text.adversary_info.adversary_label = prob_label
 
         # 环节3）判断候选词是否有效，检验约束条件，更新状态
         # 3.1 是否有出现了有效候词替代原始文本

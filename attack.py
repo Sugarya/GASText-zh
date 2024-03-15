@@ -38,7 +38,7 @@ if __name__ == '__main__':
         tools.show_log(f'origin_examples: {index} Round')
         label, text = tools.filter_example(example, args_style)
         adv_text = validator.generate_example_wrapper(label, text)
-        if adv_text is None:
+        if not adv_text:
             tools.show_log(f'origin_examples: {index} Round, continue')
             tools.show_log(f'             ----------------------------------------------------')
             continue
