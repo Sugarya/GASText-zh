@@ -12,7 +12,7 @@ class ArgStyle:
     KEY_Shopping = 'bert-shopping'
     KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Chinanews
+    Default = KEY_Shopping
 
     DatasetFile = {
         KEY_Shopping:'partly_online_shopping_cats.csv',
@@ -49,5 +49,8 @@ class Pattern:
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # 句子相似性
     SENTENCE_SIMILARITY_THRESHOLD = 0.80
+
+    # CWordAttacker算法扰动比例上限
+    CWordAttacker_Perturbation_Threshold = 0.2
 
 

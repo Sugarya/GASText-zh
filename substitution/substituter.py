@@ -35,7 +35,6 @@ class Substituter:
         elif self.__type == AlgoType.SWordMasked:
             result = self._generate_masked_candidates(substitute_unit, adv_text)
         return result
-    
 
 
     def _generate_synonyms(self, word:str, pos:str) -> List[str]:

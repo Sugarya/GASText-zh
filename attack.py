@@ -55,10 +55,8 @@ if __name__ == '__main__':
         # 分词
         substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
         # 扰动贪心查找
-        success = greedy.search(substitute_units, adv_text)
-        tools.show_log(f'             -----------------------------------------------------')
+        greedy.search(substitute_units, adv_text)
         # 收集评价指标信息
-        tools.show_log(f'adversary_info = {adv_text.adversary_info}')
         evaluator.add(adv_text.adversary_info)
         tools.show_log(f'------------------------------------------------------------------------------------')
 

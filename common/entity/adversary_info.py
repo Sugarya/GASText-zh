@@ -14,8 +14,8 @@ class AdversaryInfo(BaseEntity):
         self.attack_success:bool = False
         self.origin_label:int = origin_label 
         self.adversary_label:int = origin_label
-
         self.origin_text:str = origin_text
+        
         self.adversary_text:str = None
 
         # 原始文本的原始标签的概率值
@@ -26,7 +26,7 @@ class AdversaryInfo(BaseEntity):
         # 文本中token的总数
         self.text_token_count:int = None
         # 对抗攻击成功后，文本里被扰动的词语的数量
-        self.perturbated_token_count:int = None
+        self.perturbated_token_count:int = 0
 
         # 和原始文本的相似度，范围：0～1
         self.similarity:float = None

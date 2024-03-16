@@ -14,7 +14,8 @@ class EvaluationResult(BaseEntity):
         self.ave_adversary_accurary:float = None
         self.ave_accurary_reduction:float = None
 
-        self.attack_rate:float = None
+        self.attack_success_sum:int = None
+        self.attack_success_rate:float = None
         
         
         # 扰动数量和比率
@@ -32,7 +33,8 @@ class EvaluationResult(BaseEntity):
             'ave_origin_accurary': self.ave_origin_accurary,
             'ave_adversary_accurary': self.ave_adversary_accurary,
             'ave_accurary_reduction':self.ave_accurary_reduction,
-            'attack_rate':self.attack_rate,
+            'attack_success_sum':self.attack_success_sum,
+            'attack_success_rate':self.attack_success_rate,
             'ave_perturbated_count':self.ave_perturbated_count,
             'ave_perturbated_rate':self.ave_perturbated_rate,
             'ave_sim_score':self.ave_sim_score,

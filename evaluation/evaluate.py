@@ -76,7 +76,8 @@ class Evaluator():
         self.__evaluation_result.ave_adversary_accurary = adversary_accurary_sum / origin_example_count
         self.__evaluation_result.ave_accurary_reduction = (origin_accurary_sum - adversary_accurary_sum) / origin_example_count
 
-        self.__evaluation_result.attack_rate = attack_success_sum / origin_example_count
+        self.__evaluation_result.attack_success_sum = attack_success_sum
+        self.__evaluation_result.attack_success_rate = attack_success_sum / origin_example_count
         
         self.__evaluation_result.ave_perturbated_count = perturbed_token_sum / origin_example_count
         self.__evaluation_result.ave_perturbated_rate = perturbed_token_sum / text_token_sum
@@ -85,7 +86,7 @@ class Evaluator():
         if attack_success_sum != 0:
             self.__evaluation_result.ave_adversary_sim_score = success_similarity_score_sum / attack_success_sum 
         else:
-            self.__evaluation_result.ave_adversary_sim_score = 0 
+            self.__evaluation_result.ave_adversary_sim_score = 0
         
         self.__evaluation_result.ave_query_times = query_times_sum / origin_example_count
 
