@@ -47,7 +47,7 @@ class Validator:
 
         # DS策略
         result_score = 0
-        if True or Pattern.Algorithm == AlgoType.CWordAttacker:
+        if Pattern.Algorithm == AlgoType.CWordAttacker:
             origin_probs = adv_text.origin_probs
             if Pattern.IsTargetAttack:
                 target_label = Pattern.Target_Label
@@ -55,7 +55,15 @@ class Validator:
             else:
                 origin_label = adv_text.origin_label
                 result_score = origin_probs[origin_label] - probs[origin_label]
-        
+        else:
+            # 加权策略; 脆弱性代表偏离原位置的幅度，所以只关注幅度，不关注方向
+            origin_probs = adv_text.origin_probs
+            if Pattern.IsTargetAttack:
+                target_label = Pattern.Target_Label
+                result_score = abs(probs[target_label] - origin_probs[target_label]) + abs(probs[target_label] - origin_probs[target_label])
+            else:
+                result_score = np.sum(np.abs(probs - origin_probs))
+
         return result_score
 
 

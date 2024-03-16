@@ -170,10 +170,19 @@ class Greedy:
     def __get_decision_score(self, candidate_probs:List[float], adv_text:AdvText) -> float:
         decision_score = 0
         origin_probs = adv_text.origin_probs
-        if Pattern.IsTargetAttack:
-            target_label = Pattern.Target_Label
-            decision_score = candidate_probs[target_label] - origin_probs[target_label]
+        
+        if Pattern.Algorithm == AlgoType.CWordAttacker:
+            if Pattern.IsTargetAttack:
+                target_label = Pattern.Target_Label
+                decision_score = candidate_probs[target_label] - origin_probs[target_label]
+            else:
+                origin_label = adv_text.origin_label
+                decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
         else:
+            target_label = Pattern.Target_Label
             origin_label = adv_text.origin_label
-            decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
+            if Pattern.IsTargetAttack:
+                decision_score = (candidate_probs[target_label] - origin_probs[target_label]) + (origin_probs[origin_label] - candidate_probs[origin_label])
+            else:
+                decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
         return decision_score

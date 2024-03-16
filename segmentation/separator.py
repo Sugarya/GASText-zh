@@ -18,10 +18,7 @@ class Separator:
 
         if type == ArgSpliter.KEY_LTP:
             self.__initial_ltp()
-        elif type == ArgSpliter.KEY_JIEBA:
-            self.__initial_jieba()
         else:
-            self.__initial_ltp()
             self.__initial_jieba()
         
 
