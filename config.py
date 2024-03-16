@@ -53,4 +53,7 @@ class Pattern:
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
 
+    IsTargetAttack = True
+    Target_Label = 1
+
 

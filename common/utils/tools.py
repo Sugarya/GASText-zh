@@ -10,15 +10,15 @@ def show_log(content):
 
 '''
     @example：数据集文件的一行内容
-    @return：(, isValid)
+    @return：(int , str)
 '''
-def filter_example(example, style) -> Tuple[int, str]:
+def format_example(example, style) -> Tuple[int, str]:
     label, text = None, None
     if style == ArgStyle.KEY_Chinanews:
         label, text = int(example[0]) - 1, f'{example[1]}{example[2]}'
     else:
         label, text = int(example[0]), f'{example[1] }'   
-    return label, text
+    return (label, text)
 
 '''
     生成当前最新的文本

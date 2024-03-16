@@ -2,6 +2,7 @@ import numpy as np
 from common import tools, AdvText, HuggingFaceWrapper, TokenStyle, SubstituteState
 from .similarity_measure import SimMeasurer
 from typing import List, Tuple
+from config import Pattern, AlgoType
 
 class Validator:
 
@@ -22,26 +23,41 @@ class Validator:
         prob_label = np.argmax(probs)
         return probs, prob_label
 
-    # 数据检查通过后，再生成AdvText实例
-    def generate_example_wrapper(self, label:int, text:str) -> AdvText:
-        probs = self.__victim_model.output_probs(text)
-        prob_label = np.argmax(probs)
-        if label != prob_label: 
-            tools.show_log(f'**********************label(origin->prob): {label}-->{prob_label}, so skip example of: {text}')
-            return None
-        return AdvText(label, text, probs)
+    # 数据检查通过后，生成AdvText实例列表
+    def generate_adv_texts(self, origin_examples, args_style) -> List[AdvText]:
+        result_list = []
+        for example in origin_examples:
+            origin_label, text = tools.format_example(example, args_style)
+            if Pattern.IsTargetAttack:
+                if Pattern.Target_Label == origin_label:
+                    continue
+            probs = self.__victim_model.output_probs(text)
+            probs_label = int(np.argmax(probs))
 
+            if probs_label == origin_label:  
+                result_list.append(AdvText(origin_label, text, probs))
+        return result_list
 
     '''
-        DS策略，计算分数
+        TODO,计算脆弱值分数
     '''
-    def compute_delete_score(self, adv_text: AdvText) -> float:
-        origin_label, origin_probs = adv_text.origin_label, adv_text.origin_probs
+    def compute_fragile_score(self, adv_text: AdvText) -> float:
         updated_text = tools.generate_latest_text(adv_text)
         probs = self.__victim_model.output_probs(updated_text)
-        probs_difference = origin_probs[origin_label] - probs[origin_label]
-        # tools.show_log(f'{probs_difference} | {origin_label} -- origin_probs = {origin_probs}, probs = {probs}')
-        return probs_difference
+
+        # DS策略
+        result_score = 0
+        if True or Pattern.Algorithm == AlgoType.CWordAttacker:
+            origin_probs = adv_text.origin_probs
+            if Pattern.IsTargetAttack:
+                target_label = Pattern.Target_Label
+                result_score = probs[target_label] - origin_probs[target_label]
+            else:
+                origin_label = adv_text.origin_label
+                result_score = origin_probs[origin_label] - probs[origin_label]
+        
+        return result_score
+
 
     # 当搜索结束时（对抗攻击可能成功，可能失败），收集评价指标信息
     def collect_adversary_info(self, adv_text: AdvText):
@@ -60,5 +76,3 @@ class Validator:
         # 3 收集查询次数
         adversary_info.query_times = self.__victim_model.get_query_times()
         self.__victim_model.initial_query_time()
-        
-       

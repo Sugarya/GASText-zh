@@ -7,16 +7,18 @@ class EvaluationResult(BaseEntity):
 
     def __init__(self) -> None:
         # 原始样本的数量
-        self.origin_example_count:int = None
+        self.validated_example_count:int = None
 
         # 模型准确率
         self.ave_origin_accurary:float = None
         self.ave_adversary_accurary:float = None
         self.ave_accurary_reduction:float = None
 
+        # 攻击效果
+        self.target_attack:bool = None
+        self.target_label:int = None
         self.attack_success_sum:int = None
         self.attack_success_rate:float = None
-        
         
         # 扰动数量和比率
         self.ave_perturbated_count:int = None
@@ -30,8 +32,11 @@ class EvaluationResult(BaseEntity):
         
     def to_dict(self, obj):
         return {
-            'ave_origin_accurary': self.ave_origin_accurary,
-            'ave_adversary_accurary': self.ave_adversary_accurary,
+            'validated_example_count':self.validated_example_count,
+            'target_attack':self.target_attack,
+            'target_label':self.target_label,
+            'ave_origin_accurary':self.ave_origin_accurary,
+            'ave_adversary_accurary':self.ave_adversary_accurary,
             'ave_accurary_reduction':self.ave_accurary_reduction,
             'attack_success_sum':self.attack_success_sum,
             'attack_success_rate':self.attack_success_rate,

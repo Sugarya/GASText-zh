@@ -22,30 +22,30 @@ class Greedy:
         @return：True表示找到对抗样本，False表示没有找到
     '''
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
-        # 环节1）计算脆弱值，并按脆弱值从大到小排序
+        # 1）计算脆弱值，并按脆弱值从大到小排序
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
         
-        # 环节2）遍历语义单元序列，生成替代词--》替换--》检验
+        # 遍历语义单元序列，生成替代词--》替换--》检验
         for index, substitute_unit in enumerate(travel_substitutes):
             tools.show_log(f'*****substitute- {index} -Round')
-            # 2.1）TODO 不同算法的改动点 生成替代词
+            # 2）TODO 不同算法的改动点 生成替代词
             substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
             # 没有同义词集
             if not substitute_unit.candicates:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
                 continue
             
-            # 2.2）遍历语义单元的候选词集，逐一替换和检验
+            # 3）遍历语义单元的候选词集，逐一替换和检验
             tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.greedy_score}')
             attack_succees = self.__operate_substitute(substitute_unit, adv_text)
 
-            # 环节3 样本粒度约束条件检验
+            # 4) 样本粒度约束条件检验
             disable = self.__disable_candidate_sample(adv_text)
             if disable:
                 self.__validator.collect_adversary_info(adv_text)
                 return False
 
-            # 环节4 计算实验评价数据
+            # 5) 计算实验评价数据
             if attack_succees:
                 self.__validator.collect_adversary_info(adv_text)
                 return True
@@ -88,7 +88,7 @@ class Greedy:
 
             # 2.3 检验，输入到攻击模型；计算贪心分数
             candidate_probs, prob_label = self.__validator.model_output(latest_candidate_text)
-            cur_greedy_score = self.__greedy_selection_score(adv_text.origin_probs, candidate_probs, adv_text.origin_label)
+            cur_greedy_score = self.__get_decision_score(candidate_probs, adv_text)
             tools.show_log(f'**************candidate={candidate}, label(origin->prob): {adv_text.origin_label}->{prob_label}, cur_greedy_score = {cur_greedy_score}')
             
             # 2.4 判断当前候选词有效性,如果不是对抗样本
@@ -148,12 +148,6 @@ class Greedy:
     
 
     '''
-        贪心选择的分数值
-    '''
-    def __greedy_selection_score(self, origin_probs: List[float], candidate_probs:List[float], label:int) -> float:
-        return origin_probs[label] - candidate_probs[label]
-
-    '''
        计算按脆弱值，并按降序排序
     '''
     def __sort_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
@@ -163,9 +157,23 @@ class Greedy:
         for index, substitute in enumerate(substitute_units):
             substitute.state = SubstituteState.WORD_REPLACING
             substitute.exchange_word = ''
-            substitute.fragile_score = self.__validator.compute_delete_score(adv_text)
+            substitute.fragile_score = self.__validator.compute_fragile_score(adv_text)
             substitute.exchange_word = substitute.origin_word
             substitute.state = SubstituteState.WORD_INITIAL
             
         substitute_units = list(filter(lambda t : t.fragile_score > 0, sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True)))
         return substitute_units
+    
+    '''
+        计算贪心选择的决策值
+    '''
+    def __get_decision_score(self, candidate_probs:List[float], adv_text:AdvText) -> float:
+        decision_score = 0
+        origin_probs = adv_text.origin_probs
+        if Pattern.IsTargetAttack:
+            target_label = Pattern.Target_Label
+            decision_score = candidate_probs[target_label] - origin_probs[target_label]
+        else:
+            origin_label = adv_text.origin_label
+            decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
+        return decision_score

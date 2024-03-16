@@ -54,7 +54,6 @@ class AdversaryInfo(BaseEntity):
 class AdversaryInfoArrayJSONEncoder(JSONEncoder):
 
     def default(self, obj:AdversaryInfo):
-        print(f'obj = {obj}')
         return obj.to_dict()
    
     

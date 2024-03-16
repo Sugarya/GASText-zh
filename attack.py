@@ -42,16 +42,10 @@ if __name__ == '__main__':
 
     args_style = args.style
     origin_examples = data_loader.generate_examples(args_style)
-    evaluator.set_origin_example_count(len(origin_examples))
-    for index, example in enumerate(origin_examples):
-        tools.show_log(f'origin_examples: {index} Round')
-        label, text = tools.filter_example(example, args_style)
-        adv_text = validator.generate_example_wrapper(label, text)
-        if not adv_text:
-            tools.show_log(f'origin_examples: {index} Round, continue')
-            tools.show_log(f'             ----------------------------------------------------')
-            continue
-        
+    adv_text_list = validator.generate_adv_texts(origin_examples, args_style)
+    evaluator.set_origin_example_count(len(adv_text_list))
+    for index, adv_text in enumerate(adv_text_list):
+        tools.show_log(f'adv_text: {index} Round')
         # 分词
         substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
         # 扰动贪心查找
