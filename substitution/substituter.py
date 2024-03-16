@@ -41,7 +41,7 @@ class Substituter:
         return self.__babelnet_builder.synonyms(word, pos)
         
     def _generate_sememes(self, word:str) -> List[str]:
-        return self.__sememe_builder.sememes(word)    
+        return self.__sememe_builder.sememes(word) 
 
     def _generate_cwordattacker_candidate(self, word:str) -> List[str]:
         candidate = self.__transformer.candidate(word)

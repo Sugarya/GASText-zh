@@ -7,12 +7,17 @@ if len(DEVICES) == 0:
 elif len(DEVICES) == 1:
     DEVICES = DEVICES * 2
 
+class AlgoType(Enum):
+    CWordAttacker = 1
+    SWordFooler = 2
+    SWordMasked = 3
+
 class ArgStyle:
     NAME = '--style'
     KEY_Shopping = 'bert-shopping'
     KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Chinanews
+    Default = KEY_Shopping
 
     DatasetFile = {
         KEY_Shopping:'partly_online_shopping_cats.csv',
@@ -29,31 +34,22 @@ class ArgSpliter:
     KEY_LTP = 'ltp'
     KEY_JIEBA = 'jieba'
 
-    Default = KEY_LTP
+    Default = KEY_JIEBA
 
-
-class AlgoType(Enum):
-    CWordAttacker = 1
-    SWordFooler = 2
-    SWordMasked = 3
 '''
 运行模式
 '''
 class Pattern:
+    Algorithm = AlgoType.SWordFooler
+    IsTargetAttack = False
+    Target_Label = None
+
     IsDebug = True #是否调试
-
-    Algorithm = AlgoType.SWordMasked
-
     Masked_Bert = 'google-bert/bert-base-chinese'
-
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # 句子相似性
     SENTENCE_SIMILARITY_THRESHOLD = 0.80
-
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
-
-    IsTargetAttack = False
-    Target_Label = None
 
 

@@ -35,7 +35,7 @@ if __name__ == '__main__':
     greedy = Greedy(validator, substituter)
 
     # 初始化分词器
-    separator = Separator(args.style)
+    separator = Separator(args.split)
 
     # 初始化评价器
     evaluator = Evaluator()
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     for index, adv_text in enumerate(adv_text_list):
         tools.show_log(f'adv_text: {index} Round')
         # 分词
-        substitute_units: List[SubstituteUnit] = separator.splitByLTP(adv_text)
+        substitute_units: List[SubstituteUnit] = separator.split(adv_text)
         # 扰动贪心查找
         greedy.search(substitute_units, adv_text)
         # 收集评价指标信息
