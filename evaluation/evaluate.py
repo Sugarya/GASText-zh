@@ -39,7 +39,7 @@ class Evaluator():
         with open(file_path, 'w', encoding='utf-8', errors='replace') as f:
             # f.writelines(lines)
             json.dump(self.__evaluation_result, f, ensure_ascii=False, default=self.__evaluation_result.to_dict)
-            f.write('\n\nThe detail of examples are following：\n\n')
+            f.write('\n\n\n')
             json.dump(self.__adversary_infos, f, ensure_ascii=False, cls=AdversaryInfoArrayJSONEncoder)
             
 

@@ -1,9 +1,10 @@
 from typing import List
-
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-from common import parse_arguments, AdvText, tools, SubstituteUnit, HuggingFaceWrapper
+
+from argpaser import parse_arguments
+from common import tools, SubstituteUnit, HuggingFaceWrapper
 from config import DEVICES, MAPPING, Pattern
-from dataset import load_data
+from dataset import DataLoader
 from segmentation import Separator, SeparatorType
 from validation import Validator
 from perturbation_search import Greedy
@@ -11,8 +12,12 @@ from substitution import Substituter
 from evaluation import Evaluator
 
 
+
 if __name__ == '__main__':
     args = parse_arguments()
+
+    # 初始化数据集加载器
+    data_loader = DataLoader()
 
     # 初始化 被攻击的模型
     victim_path = MAPPING[args.style].victim
@@ -34,10 +39,9 @@ if __name__ == '__main__':
 
     # 初始化评价器
     evaluator = Evaluator()
-    
 
     args_style = args.style
-    origin_examples = load_data(args_style)
+    origin_examples = data_loader.generate_examples(args_style)
     evaluator.set_origin_example_count(len(origin_examples))
     for index, example in enumerate(origin_examples):
         tools.show_log(f'origin_examples: {index} Round')
