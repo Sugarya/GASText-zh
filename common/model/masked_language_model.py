@@ -1,13 +1,13 @@
 from transformers import AutoTokenizer, AutoModelForMaskedLM, pipeline
-from config import *
-from typing import *
+from config import Pattern, DEVICES
+from typing import List
 
 class BertMaskedModelWrapper:
 
     MASK_TOKEN = '[MASK]'
 
     def __init__(self) -> None:
-        model_name = MODEL_POOL[KEY.Masked_Bert] # "bert-base-chinese"
+        model_name = Pattern.Masked_Bert # "bert-base-chinese"
         tokenizer = AutoTokenizer.from_pretrained(model_name)
         model = AutoModelForMaskedLM.from_pretrained(model_name).to(DEVICES[1])
         self.__unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer) 

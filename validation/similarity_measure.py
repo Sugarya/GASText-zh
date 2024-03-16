@@ -1,6 +1,6 @@
 
 from sentence_transformers import SentenceTransformer, util
-from config import KEY, MODEL_POOL
+from config import Pattern
 from common import tools
 from typing import List
 
@@ -10,8 +10,7 @@ from typing import List
 class SimMeasurer:
 
     def __init__(self):
-        model_name = MODEL_POOL[KEY.SentenceSimilarity]
-        self.__sim_model = SentenceTransformer(model_name)
+        self.__sim_model = SentenceTransformer(Pattern.SentenceSimilarityModel)
         
 
     '''

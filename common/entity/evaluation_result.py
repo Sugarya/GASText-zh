@@ -16,10 +16,14 @@ class EvaluationResult(BaseEntity):
 
         self.attack_rate:float = None
         
-        # 扰动率
+        
+        # 扰动数量和比率
+        self.ave_perturbated_count:int = None
         self.ave_perturbated_rate:float = None
 
+        # 对抗样本和原始样本的平均相似程度
         self.ave_sim_score:float = None
+        self.ave_adversary_sim_score:float = None
 
         self.ave_query_times:int = None
         
@@ -29,7 +33,9 @@ class EvaluationResult(BaseEntity):
             'ave_adversary_accurary': self.ave_adversary_accurary,
             'ave_accurary_reduction':self.ave_accurary_reduction,
             'attack_rate':self.attack_rate,
+            'ave_perturbated_count':self.ave_perturbated_count,
             'ave_perturbated_rate':self.ave_perturbated_rate,
             'ave_sim_score':self.ave_sim_score,
+            'ave_adversary_sim_score':self.ave_adversary_sim_score,
             'ave_query_times':self.ave_query_times
         }

@@ -1,7 +1,6 @@
 
-from config import Pattern, KEY
+from config import Pattern, ArgStyle
 from common import AdvText, TokenStyle, SubstituteState
-from nltk.corpus import wordnet as wn
 from typing import List, Tuple
 
 
@@ -15,7 +14,7 @@ def show_log(content):
 '''
 def filter_example(example, style) -> Tuple[int, str]:
     label, text = None, None
-    if style == KEY.Chinanews:
+    if style == ArgStyle.KEY_Chinanews:
         label, text = int(example[0]) - 1, f'{example[1]}{example[2]}'
     else:
         label, text = int(example[0]), f'{example[1] }'   
@@ -54,24 +53,3 @@ def generate_text(adv_text: AdvText) -> str:
             display_list[index] = token_unit.origin_token
     text = ''.join(display_list)
     return text
-    
-# def to_hownet_pos(pos:str):
-#     upper_pos = pos.upper()
-#     if upper_pos.startswith('J') or upper_pos.startswith('A'):
-#         return wn.ADJ
-#     elif upper_pos.startswith('V'):
-#         return wn.VERB
-#     elif upper_pos.startswith('N'):
-#         return wn.NOUN
-#     elif upper_pos.startswith('R'):
-#         return wn.ADV
-#     else:
-#         return None
-
-def similary_words(word1: str, word2: str) -> float:
-
-    pass
-
-def similary_sentences(sentence1: str, sentence2: str) -> float:
-    
-    pass

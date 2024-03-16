@@ -4,26 +4,21 @@ import jieba
 import jieba.posseg as pseg
 import jieba.analyse
 from common import tools, AdvText, TokenUnit, TokenStyle, SubstituteUnit
-from enum import Enum
 from typing import List
-
-class SeparatorType(Enum):
-    LTP = 1 #使用ltp分词库
-    JIE_BA = 2 #使用jieba分词库
-    ALL = 3 #都使用
+from config import ArgSpliter
 
 '''
     中文划分器
 '''
 class Separator:
 
-    def __init__(self, type: SeparatorType) -> None:
+    def __init__(self, type: str) -> None:
         # self.POS_FILTER = ('a', 'd', 'i', 'n', 'v', 'nl', 'vn','ad', 'vd')
         self.POS_LTP_FILTER = ('a', 'b', 'd', 'n', 'v')
 
-        if type == SeparatorType.LTP:
+        if type == ArgSpliter.KEY_LTP:
             self.__initial_ltp()
-        elif type == SeparatorType.JIE_BA:
+        elif type == ArgSpliter.KEY_JIEBA:
             self.__initial_jieba()
         else:
             self.__initial_ltp()

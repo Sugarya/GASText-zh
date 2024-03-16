@@ -12,6 +12,7 @@ class AdversaryInfo(BaseEntity):
     def __init__(self, origin_text:str, origin_label:int, origin_accurary:float):
         # 是否攻击成功
         self.attack_success:bool = False
+        self.origin_label:int = origin_label 
         self.adversary_label:int = origin_label
 
         self.origin_text:str = origin_text
@@ -36,6 +37,7 @@ class AdversaryInfo(BaseEntity):
     def to_dict(self):
         return {
             'attack_success':self.attack_success,
+            'origin_label':int(self.origin_label),
             'adversary_label':int(self.adversary_label),
             'origin_text':str(self.origin_text),
             'adversary_text':str(self.adversary_text),

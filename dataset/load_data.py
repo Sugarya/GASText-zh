@@ -1,18 +1,18 @@
 
 import csv
-from config import KEY, MAPPING
+from config import ArgStyle
 from common import tools
 
 class DataLoader():
 
 
     def generate_examples(self, style_name):
-        file_path = f'./dataset/src/{MAPPING[style_name].dataset}'
+        file_path = f'./dataset/src/{ArgStyle.DatasetFile[style_name]}'
         tools.show_log(f'file_path = {file_path}')
 
-        if style_name == KEY.Shopping:
+        if style_name == ArgStyle.KEY_Shopping:
             examples = self.__read_corpus_of_online_shopping(file_path)
-        elif style_name == KEY.Chinanews:
+        elif style_name == ArgStyle.KEY_Chinanews:
             examples = self.__read_corpus_of_chinanews(file_path)
         else:
             examples = self.__read_corpus(file_path)

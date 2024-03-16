@@ -1,11 +1,11 @@
 from typing import List
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
-from argpaser import parse_arguments
+from arguement import parse_args
 from common import tools, SubstituteUnit, HuggingFaceWrapper
-from config import DEVICES, MAPPING, Pattern
+from config import DEVICES, Pattern, ArgStyle, ArgSpliter
 from dataset import DataLoader
-from segmentation import Separator, SeparatorType
+from segmentation import Separator
 from validation import Validator
 from perturbation_search import Greedy
 from substitution import Substituter
@@ -14,13 +14,13 @@ from evaluation import Evaluator
 
 
 if __name__ == '__main__':
-    args = parse_arguments()
+    args = parse_args()
 
     # 初始化数据集加载器
     data_loader = DataLoader()
 
     # 初始化 被攻击的模型
-    victim_path = MAPPING[args.style].victim
+    victim_path = ArgStyle.Victim_Model[args.style]
     classifier = AutoModelForSequenceClassification.from_pretrained(victim_path).to(DEVICES[1])
     tokenizer = AutoTokenizer.from_pretrained(victim_path, use_fast = True)
     victim_model = HuggingFaceWrapper(classifier, tokenizer)
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     greedy = Greedy(validator, substituter)
 
     # 初始化分词器
-    separator = Separator(SeparatorType.LTP)
+    separator = Separator(args.style)
 
     # 初始化评价器
     evaluator = Evaluator()
