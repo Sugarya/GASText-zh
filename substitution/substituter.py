@@ -27,27 +27,27 @@ class Substituter:
         result = []
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         tools.show_log(f'Substituter origin word = {origin_word}, pos = {origin_pos}')
-        if self.__type == AlgoType.SWordFooler:
-            result = self._generate_synonyms(origin_word, origin_pos)
-            # result = self._generate_sememes(origin_word)
-        elif self.__type == AlgoType.CWordAttacker:
-            result = self._generate_cwordattacker_candidate(origin_word)
+        if self.__type == AlgoType.CWordAttacker:
+            result = self.generate_cwordattacker_candidate(origin_word)
+        elif self.__type == AlgoType.SWordFooler:
+            result = self.generate_synonyms(origin_word, origin_pos)
         elif self.__type == AlgoType.SWordMasked:
-            result = self._generate_masked_candidates(substitute_unit, adv_text)
+            result = self.generate_masked_candidates(substitute_unit, adv_text)
         return result
 
+    
+    
+    def generate_cwordattacker_candidate(self, word:str) -> List[str]:
+        candidate = self.__transformer.candidate(word)
+        return [candidate]
 
-    def _generate_synonyms(self, word:str, pos:str) -> List[str]:
+    def generate_synonyms(self, word:str, pos:str) -> List[str]:
         return self.__babelnet_builder.synonyms(word, pos)
         
     def _generate_sememes(self, word:str) -> List[str]:
         return self.__sememe_builder.sememes(word) 
 
-    def _generate_cwordattacker_candidate(self, word:str) -> List[str]:
-        candidate = self.__transformer.candidate(word)
-        return [candidate]
-    
-    def _generate_masked_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def generate_masked_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
         candidate_list = self.__masked_builder.candidates(substitute_unit, adv_text)
         return candidate_list
 

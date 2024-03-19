@@ -4,32 +4,24 @@ from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
 
-'''
-    贪心搜索
-'''
-class Greedy:
-
+class WordFoolerGreedy:
 
     def __init__(self, validator: Validator, substituter: Substituter) -> None:
         self.__validator = validator
         self.__substituter = substituter
 
 
-
-    
-    '''
-        扰动搜索
-        @return：True表示找到对抗样本，False表示没有找到
-    '''
-    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
+    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
         # 1）计算脆弱值，并按脆弱值从大到小排序
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
         # 遍历语义单元序列，生成替代词--》替换--》检验
         for index, substitute_unit in enumerate(travel_substitutes):
             tools.show_log(f'*****substitute- {index} -Round')
-            # 2）TODO 不同算法的改动点 生成替代词
-            substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
+            
+            # 2）生成替代词
+            origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
+            substitute_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
             # 没有同义词集
             if not substitute_unit.candicates:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
@@ -51,17 +43,13 @@ class Greedy:
                 return True
         
         self.__validator.collect_adversary_info(adv_text)
+        return False    
+
+
+   # TODO 提供样本粒度的条件约束
+    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
         return False
 
-    # TODO 提供样本粒度的条件约束
-    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
-        if Pattern.Algorithm == AlgoType.CWordAttacker:
-            if adv_text.adversary_info.perturbated_token_count >= Pattern.CWordAttacker_Perturbation_Threshold * adv_text.token_count:
-                tools.show_log(f'CWordAttacker perturbated_token_count{adv_text.adversary_info.perturbated_token_count} >=thresthod')
-                return True
-            
-
-        return False    
 
     '''
         处理单个语义单元，共有3个环节：初始化，逐一替换和检验，产生有效替代
@@ -129,14 +117,7 @@ class Greedy:
             tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_greedy_score} <= {substitute.initial_greedy_score}initial_greedy_score')
             return False
         
-        # 3.2 TODO 语义单元粒度，相似性约束检验
-        if Pattern.Algorithm == AlgoType.SWordMasked:
-            sim_score = self.__validator.cosine_similarity(adv_text.origin_text, substitute.exchange_max_greedy_text) 
-            tools.show_log(f'**************sim_score = {sim_score}')
-            if sim_score < Pattern.SENTENCE_SIMILARITY_THRESHOLD:
-                substitute.state = SubstituteState.WORD_INITIAL
-                tools.show_log(f'**************return substitute.state = {substitute.state}, sim_score{sim_score}<0.8')
-                return False
+        # # 3.2 TODO 语义单元粒度：相似性约束检验
 
         # 3.3 本轮产生了有效替代，更新全局greedy_score和substitute state
         adv_text.greedy_score = substitute.exchange_max_greedy_score
@@ -145,22 +126,18 @@ class Greedy:
         tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
 
         return False
-    
+
 
     '''
-       TODO 计算脆弱值，并降序排序
+       计算脆弱值，并降序排序
     '''
     def __sort_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
-        # 1 DS策略计算
+        # 1 计算脆弱值
         # //TODO 验证：是否要取前 Top k个，是否要过滤掉负值
         for index, substitute in enumerate(substitute_units):
             if substitute.state == SubstituteState.WORD_REPLACED:
                 continue
-            substitute.state = SubstituteState.WORD_REPLACING
-            substitute.exchange_word = ''
-            substitute.fragile_score = self.__validator.compute_fragile_score(adv_text)
-            substitute.exchange_word = substitute.origin_word
-            substitute.state = SubstituteState.WORD_INITIAL
+            self.__validator.operate_fragile(substitute, adv_text)
         
         # 2 sort排序  
         substitute_units = list(filter(lambda t : t.fragile_score > 0, sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True)))

@@ -1,1 +1,1 @@
-from .greed_search import *
+from .searcher import *

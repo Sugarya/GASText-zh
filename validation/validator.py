@@ -1,27 +1,20 @@
 import numpy as np
-from common import tools, AdvText, HuggingFaceWrapper, TokenStyle, SubstituteState
-from .similarity_measure import SimMeasurer
 from typing import List, Tuple
 from config import Pattern, AlgoType
+
+from common.model import HuggingFaceWrapper
+from common.entity import SubstituteUnit, SubstituteState, TokenStyle,AdvText
+from common.utils import tools
+
+from .similarity_measure import SimMeasurer
+from .fragile_measure import FragileMeasurer
 
 class Validator:
 
     def __init__(self, victim_model: HuggingFaceWrapper) -> None:
         self.__victim_model = victim_model
+        self.__fragile_measurer = FragileMeasurer(victim_model)
         self.__sim_measurer = SimMeasurer()
-
-
-    '''
-        计算两个句子的cosin的语义相似值
-    '''
-    def cosine_similarity(self, origin_text:str, adversary_candidate_text:str) -> float:
-        sim_score = self.__sim_measurer.compute_cos_similarity(origin_text, adversary_candidate_text)
-        return sim_score
-
-    def model_output(self, candidate_text:str) -> Tuple[List[float], int]:
-        probs = self.__victim_model.output_probs(candidate_text)
-        prob_label = np.argmax(probs)
-        return probs, prob_label
 
     # 数据检查通过后，生成AdvText实例列表
     def generate_adv_texts(self, origin_examples, args_style) -> List[AdvText]:
@@ -38,33 +31,28 @@ class Validator:
                 result_list.append(AdvText(origin_label, text, probs))
         return result_list
 
-    '''
-        TODO，按不同的策略，计算脆弱值分数
-    '''
-    def compute_fragile_score(self, adv_text: AdvText) -> float:
-        updated_text = tools.generate_latest_text(adv_text)
-        probs = self.__victim_model.output_probs(updated_text)
+    def model_output(self, candidate_text:str) -> Tuple[List[float], int]:
+        probs = self.__victim_model.output_probs(candidate_text)
+        prob_label = np.argmax(probs)
+        return probs, prob_label
 
-        # DS策略
-        result_score = 0
+    '''
+        计算两个句子的cosin的语义相似值
+    '''
+    def cosine_similarity(self, origin_text:str, adversary_candidate_text:str) -> float:
+        sim_score = self.__sim_measurer.compute_cos_similarity(origin_text, adversary_candidate_text)
+        return sim_score
+
+    '''
+        TODO 按不同的策略
+    '''
+    def operate_fragile(self, substitute: SubstituteUnit, adv_text: AdvText):
         if Pattern.Algorithm == AlgoType.CWordAttacker:
-            origin_probs = adv_text.origin_probs
-            if Pattern.IsTargetAttack:
-                target_label = Pattern.Target_Label
-                result_score = probs[target_label] - origin_probs[target_label]
-            else:
-                origin_label = adv_text.origin_label
-                result_score = origin_probs[origin_label] - probs[origin_label]
+            self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
+        elif Pattern.Algorithm == AlgoType.SWordFooler:
+            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
         else:
-            # 加权策略; 脆弱性代表偏离原位置的幅度，所以只关注幅度，不关注方向
-            origin_probs = adv_text.origin_probs
-            if Pattern.IsTargetAttack:
-                target_label = Pattern.Target_Label
-                result_score = abs(probs[target_label] - origin_probs[target_label]) + abs(probs[target_label] - origin_probs[target_label])
-            else:
-                result_score = np.sum(np.abs(probs - origin_probs))
-
-        return result_score
+            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
 
 
     # 当搜索结束时（对抗攻击可能成功，可能失败），收集评价指标信息
