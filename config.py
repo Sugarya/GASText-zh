@@ -17,7 +17,7 @@ class ArgStyle:
     KEY_Shopping = 'bert-shopping'
     KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Shopping
+    Default = KEY_Chinanews
 
     DatasetFile = {
         KEY_Shopping:'partly_online_shopping_cats.csv',
@@ -40,7 +40,7 @@ class ArgSpliter:
 运行模式
 '''
 class Pattern:
-    Algorithm = AlgoType.CWordAttacker
+    Algorithm = AlgoType.SWordFooler
     IsTargetAttack = False
     Target_Label = None
 

@@ -27,7 +27,7 @@ class BabelNetBuilder:
         TODO 需要性能优化
     '''
     def __synonyms(self, lemma:str, word_pos:str=None):
-        candidate_list = []
+        candidate_list = [lemma, '']
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH)
             for synonyms in synonyms_list:
