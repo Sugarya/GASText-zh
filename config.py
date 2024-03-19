@@ -34,13 +34,13 @@ class ArgSpliter:
     KEY_LTP = 'ltp'
     KEY_JIEBA = 'jieba'
 
-    Default = KEY_JIEBA
+    Default = KEY_LTP
 
 '''
 运行模式
 '''
 class Pattern:
-    Algorithm = AlgoType.SWordFooler
+    Algorithm = AlgoType.CWordAttacker
     IsTargetAttack = False
     Target_Label = None
 

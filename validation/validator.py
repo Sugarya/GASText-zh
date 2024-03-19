@@ -39,7 +39,7 @@ class Validator:
         return result_list
 
     '''
-        TODO,计算脆弱值分数
+        TODO，按不同的策略，计算脆弱值分数
     '''
     def compute_fragile_score(self, adv_text: AdvText) -> float:
         updated_text = tools.generate_latest_text(adv_text)

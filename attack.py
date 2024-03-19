@@ -1,3 +1,5 @@
+# Created by Ethan Ruan
+# Email: sugarya@foxmail.com
 from typing import List
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 

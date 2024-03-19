@@ -24,7 +24,7 @@ class Greedy:
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
         # 1）计算脆弱值，并按脆弱值从大到小排序
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
-        
+
         # 遍历语义单元序列，生成替代词--》替换--》检验
         for index, substitute_unit in enumerate(travel_substitutes):
             tools.show_log(f'*****substitute- {index} -Round')
@@ -148,19 +148,21 @@ class Greedy:
     
 
     '''
-       计算按脆弱值，并按降序排序
+       TODO 计算脆弱值，并降序排序
     '''
     def __sort_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
-        # 1. 计算
-        # 2.sort排序
+        # 1 DS策略计算
         # //TODO 验证：是否要取前 Top k个，是否要过滤掉负值
         for index, substitute in enumerate(substitute_units):
+            if substitute.state == SubstituteState.WORD_REPLACED:
+                continue
             substitute.state = SubstituteState.WORD_REPLACING
             substitute.exchange_word = ''
             substitute.fragile_score = self.__validator.compute_fragile_score(adv_text)
             substitute.exchange_word = substitute.origin_word
             substitute.state = SubstituteState.WORD_INITIAL
-            
+        
+        # 2 sort排序  
         substitute_units = list(filter(lambda t : t.fragile_score > 0, sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True)))
         return substitute_units
     

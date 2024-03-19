@@ -35,7 +35,9 @@ class Evaluator():
             os.makedirs(dir_file_path)
         
         arg_style = ArgumentDict['style']
-        file_path=f'{dir_file_path}/{arg_style}_{math.floor(time.time())}.json'
+        localtime = time.localtime(time.time())
+        date_time = f'{localtime[1]}{localtime[2]}_{localtime[3]}{localtime[4]}{localtime[5]}'
+        file_path = f'{dir_file_path}/{arg_style}_{date_time}.json'
         tools.show_log(f'The file path of experiment result is {file_path}')
         with open(file_path, 'w', encoding='utf-8', errors='replace') as f:
             # f.writelines(lines)
