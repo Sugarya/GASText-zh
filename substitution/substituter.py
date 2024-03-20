@@ -16,14 +16,13 @@ class Substituter:
         self.__type = type
         if self.__type == AlgoType.SWordFooler:
             self.__babelnet_builder = BabelNetBuilder()
-            # self.__sememe_builder = SememeBuilder()
         elif type == AlgoType.CWordAttacker:
             self.__transformer = CWordAttackerTransformer()
         elif type == AlgoType.SWordMasked:
             self.__masked_builder = MaskedCandidateBuilder()
 
 
-    def generate(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def __generate(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
         result = []
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         tools.show_log(f'Substituter origin word = {origin_word}, pos = {origin_pos}')
@@ -44,8 +43,8 @@ class Substituter:
     def generate_synonyms(self, word:str, pos:str) -> List[str]:
         return self.__babelnet_builder.synonyms(word, pos)
         
-    def _generate_sememes(self, word:str) -> List[str]:
-        return self.__sememe_builder.sememes(word) 
+    # def generate_sememes(self, word:str) -> List[str]:
+    #     return self.__sememe_builder.sememes(word) 
 
     def generate_masked_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
         candidate_list = self.__masked_builder.candidates(substitute_unit, adv_text)

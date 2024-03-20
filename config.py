@@ -40,7 +40,7 @@ class ArgSpliter:
 运行模式
 '''
 class Pattern:
-    Algorithm = AlgoType.CWordAttacker
+    Algorithm = AlgoType.SWordFooler
     IsTargetAttack = False
     Target_Label = None
 

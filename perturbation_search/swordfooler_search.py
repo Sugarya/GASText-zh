@@ -13,6 +13,7 @@ class WordFoolerGreedy:
 
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
         # 1）计算脆弱值，并按脆弱值从大到小排序
+        tools.show_log(f'search, the len of substitute_units = {len(substitute_units)}')
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
         # 遍历语义单元序列，生成替代词--》替换--》检验
@@ -22,8 +23,9 @@ class WordFoolerGreedy:
             # 2）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             substitute_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
+            
             # 没有同义词集
-            if not substitute_unit.candicates:
+            if len(substitute_unit.candicates) <= 2:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
                 continue
             
@@ -138,6 +140,7 @@ class WordFoolerGreedy:
             if substitute.state == SubstituteState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
+            tools.show_log(f'compute fragile score-{index}, fragile_score = {substitute.fragile_score}')
         
         # 2 sort排序  
         substitute_units = list(filter(lambda t : t.fragile_score > 0, sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True)))
