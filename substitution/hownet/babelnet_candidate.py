@@ -30,6 +30,7 @@ class BabelNetBuilder:
     def __synonyms(self, lemma:str, word_pos:str=None):
         candidates = set([lemma, ''])
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
+        # word_pos = None
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
             for synonyms in synonyms_list:

@@ -13,7 +13,7 @@ class WordFoolerGreedy:
 
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
         # 1）计算脆弱值，并按脆弱值从大到小排序
-        tools.show_log(f'search, the len of substitute_units = {len(substitute_units)}')
+        tools.show_log(f'WordFoolerGreedy search, the length of substitute_units = {len(substitute_units)}')
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
         # 遍历语义单元序列，生成替代词--》替换--》检验
@@ -157,8 +157,8 @@ class WordFoolerGreedy:
             tools.show_log(f'compute fragile score-{index}, fragile_score = {substitute.fragile_score}')
         
         # 2 sort排序  
-        substitute_units = list(filter(lambda t : t.fragile_score > 0, sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True)))
-        return substitute_units
+        result_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))
+        return result_list
     
     '''
         计算贪心选择的决策值

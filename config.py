@@ -17,7 +17,7 @@ class ArgStyle:
     KEY_Shopping = 'bert-shopping'
     KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Shopping
+    Default = KEY_Chinanews
 
     DatasetFile = {
         KEY_Shopping:'partly_online_shopping_cats.csv',
@@ -41,8 +41,8 @@ class ArgSpliter:
 '''
 class Pattern:
     Algorithm = AlgoType.SWordFooler
-    IsTargetAttack = False
-    Target_Label = None
+    IsTargetAttack = True
+    Target_Label = 5
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'

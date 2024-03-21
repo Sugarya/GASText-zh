@@ -20,6 +20,7 @@ class WordAttackerGreedy:
         @return：True表示找到对抗样本，False表示没有找到
     '''
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
+        tools.show_log(f'WordAttackerGreedy search, the length of substitute_units = {len(substitute_units)}')
         # 1）计算脆弱值，并按脆弱值从大到小排序
         travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
