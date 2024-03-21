@@ -28,17 +28,13 @@ class BabelNetBuilder:
         TODO 需要性能优化
     '''
     def __synonyms(self, lemma:str, word_pos:str=None):
-        candidate_list = [lemma, '']
+        candidates = set([lemma, ''])
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
             for synonyms in synonyms_list:
-                # tools.show_log(f'pos = {synonyms.pos}, synonym = {synonyms.zh_synonyms}')
-                candidate_list.extend(synonyms.zh_synonyms)
-                # for syn_zh in synonyms.zh_synonyms:
-                #     if syn_zh not in candidate_list:
-                #         candidate_list.append(syn_zh)
-            candidate_list = list(set(candidate_list))
+                candidates.update(synonyms.zh_synonyms)
+        candidate_list = list(candidates)
         tools.show_log(f'BabelNetBuilder ｜ candidate_list of {lemma}-{word_pos} = {candidate_list}')      
         return candidate_list
     

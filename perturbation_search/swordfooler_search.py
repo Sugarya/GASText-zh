@@ -35,10 +35,10 @@ class WordFoolerGreedy:
             attack_succees = self.__operate_substitute(substitute_unit, adv_text)
 
             # 4) 样本粒度约束条件检验
-            disable = self.__disable_candidate_sample(adv_text)
-            if disable:
-                self.__validator.collect_adversary_info(adv_text)
-                return False
+            # disable = self.__disable_candidate_sample(adv_text)
+            # if disable:
+            #     self.__validator.collect_adversary_info(adv_text)
+            #     return False
 
             # 5) 计算实验评价数据
             if attack_succees:
@@ -69,41 +69,42 @@ class WordFoolerGreedy:
         # 环节2）逐一遍历候选词集，尝试找到最佳替换词
         for index, candidate in enumerate(substitute.candicates):
             
-            # 2.1 替换动作
+            # 2.1 替换并生成替换后的候选文本
             substitute.exchange_word = candidate
             substitute.state = SubstituteState.WORD_REPLACING
             tools.show_log(f'************** {index} -round, candidate = {candidate}, substitute.state = {substitute.state}')
-            
-            # 2.2 生成替换后的候选文本
             latest_candidate_text = tools.generate_latest_text(adv_text)
 
-            # 2.3 检验，输入到攻击模型；计算决策分数
+            # 2.2 检验，输入到攻击模型；计算决策分数
             candidate_probs, prob_label = self.__validator.model_output(latest_candidate_text)
             cur_decision_score = self.__get_decision_score(candidate_probs, adv_text)
             tools.show_log(f'**************candidate={candidate}, label(origin->prob): {adv_text.origin_label}->{prob_label}, cur_greedy_score = {cur_decision_score}')
             
-            # 2.4 判断当前候选词有效性,如果不是对抗样本
+            # 2.3 判断当前候选词是否是最佳的
             if cur_decision_score <= substitute.initial_decision_score:
                 tools.show_log(f'************** continue --> cur_decision_score{cur_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
                 continue
             if cur_decision_score <= substitute.exchange_max_decision_score:
                 tools.show_log(f'************** continue --> cur_decision_score{cur_decision_score} <= {substitute.exchange_max_decision_score}exchange_max_greedy_score')
                 continue
+            # sim_score = self.__validator.cosine_similarity(adv_text.origin_text, latest_candidate_text)
+            # if sim_score < Pattern.Sentence_Similarity_Threshold:
+            #     tools.show_log(f'************** sim_score{sim_score} < {Pattern.Sentence_Similarity_Threshold}')
+            #     continue
             
-            sim_score = self.__validator.cosine_similarity(adv_text.origin_text, latest_candidate_text)
-            if sim_score < Pattern.Sentence_Similarity_Threshold:
-                tools.show_log(f'************** sim_score{sim_score} < {Pattern.Sentence_Similarity_Threshold}')
-                continue
-            
-            # 2.5 找到最佳替换词，更新语义词信息
+            # 2.4 找到最佳替换词，更新语义词信息
             substitute.exchange_max_decision_score = cur_decision_score
             substitute.exchange_max_decision_word = candidate
             substitute.exchange_max_decision_label = prob_label
             substitute.exchange_max_decision_prob = candidate_probs[adv_text.origin_label]
             substitute.exchange_max_decision_text = latest_candidate_text
-            
+        
             tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_label = {substitute.exchange_max_decision_label}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
             tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_decision_text}')
+            
+            # 2.5 如果成功，不再搜索
+            if prob_label != adv_text.origin_label:
+                break
 
         # 环节3）判断累计决策得到的最佳候选词是否有效
         # 3.1 决策累计搜索是否更新了替换词
@@ -113,12 +114,12 @@ class WordFoolerGreedy:
             return False
         
         # # 3.2 TODO 是否满足语义词级别的相似性标准
-        sim_score = self.__validator.cosine_similarity(adv_text.origin_text, substitute.exchange_max_decision_text)
+        # sim_score = self.__validator.cosine_similarity(adv_text.origin_text, substitute.exchange_max_decision_text)
         # tools.show_log(f'**************__operate_substitute sim_score = {sim_score}')
-        if sim_score < Pattern.Sentence_Similarity_Threshold:
-            substitute.state = SubstituteState.WORD_INITIAL
-            tools.show_log(f'**************return sim_score = {sim_score} < {Pattern.Sentence_Similarity_Threshold}')
-            return False
+        # if sim_score < Pattern.Sentence_Similarity_Threshold:
+        #     substitute.state = SubstituteState.WORD_INITIAL
+        #     tools.show_log(f'**************return sim_score = {sim_score} < {Pattern.Sentence_Similarity_Threshold}')
+        #     return False
         
         # 环节4）本轮产生了的最佳且有效的替换词
         # 4.1 更新全局信息
@@ -132,8 +133,8 @@ class WordFoolerGreedy:
         adv_text.adversary_info.adversary_label = substitute.exchange_max_decision_label
         
         # 4.3 判断当前候选文本是否对抗成功
-        adversary_success = (substitute.exchange_max_decision_label != adv_text.origin_label)
-        if adversary_success:
+        cur_adversary_success = (substitute.exchange_max_decision_label != adv_text.origin_label)
+        if cur_adversary_success:
             # 收集评价指标信息
             adv_text.adversary_info.attack_success = True
             tools.show_log(f'**************ATTACK SUCCESS**************')
