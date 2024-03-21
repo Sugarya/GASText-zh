@@ -17,7 +17,7 @@ class SimMeasurer:
         获得余弦相似计算下的相似值
     '''
     def compute_cos_similarity(self, sentence1:str, sentence2:str) -> float:
-        if not sentence1 and not sentence2:
+        if not sentence1 or not sentence2:
             return 0
         
         embedding1 = self.__sim_model.encode(sentence1, convert_to_tensor=True)

@@ -17,7 +17,7 @@ class ArgStyle:
     KEY_Shopping = 'bert-shopping'
     KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Chinanews
+    Default = KEY_Shopping
 
     DatasetFile = {
         KEY_Shopping:'partly_online_shopping_cats.csv',

@@ -15,8 +15,7 @@ class AdversaryInfo(BaseEntity):
         self.origin_label:int = origin_label 
         self.adversary_label:int = origin_label
         self.origin_text:str = origin_text
-        
-        self.adversary_text:str = None
+        self.adversary_text:str = origin_text
 
         # 原始文本的原始标签的概率值
         self.origin_accurary:float = origin_accurary
