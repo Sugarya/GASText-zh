@@ -36,7 +36,7 @@ class WordAttackerGreedy:
                 continue
             
             # 3）遍历语义单元的候选词集，逐一替换和检验
-            tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.greedy_score}')
+            tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.decision_score}')
             attack_succees = self.__operate_substitute(substitute_unit, adv_text)
 
             # 4) 样本粒度约束条件检验
@@ -62,9 +62,9 @@ class WordAttackerGreedy:
     def __operate_substitute(self, substitute:SubstituteUnit, adv_text:AdvText) -> bool:
         
         # 环节1) SubstituteUnit初始化
-        substitute.initial_greedy_score = adv_text.greedy_score
-        substitute.exchange_max_greedy_score = adv_text.greedy_score
-        substitute.exchange_max_greedy_word = substitute.origin_word
+        substitute.initial_decision_score = adv_text.decision_score
+        substitute.exchange_max_decision_score = adv_text.decision_score
+        substitute.exchange_max_decision_word = substitute.origin_word
 
         # 环节2）遍历候选词集，逐一操作
         for index, candidate in enumerate(substitute.candicates):
@@ -85,19 +85,19 @@ class WordAttackerGreedy:
             
             # 2.4 判断当前候选词有效性,如果不是对抗样本
             adversary_success = (prob_label != adv_text.origin_label)
-            if not adversary_success and cur_greedy_score <= substitute.initial_greedy_score:
-                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.initial_greedy_score}initial_greedy_score')
+            if not adversary_success and cur_greedy_score <= substitute.initial_decision_score:
+                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.initial_decision_score}initial_greedy_score')
                 continue
-            if not adversary_success and cur_greedy_score <= substitute.exchange_max_greedy_score:
-                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.exchange_max_greedy_score}exchange_max_greedy_score')
+            if not adversary_success and cur_greedy_score <= substitute.exchange_max_decision_score:
+                tools.show_log(f'************** continue --> cur_greedy_score{cur_greedy_score} <= {substitute.exchange_max_decision_score}exchange_max_greedy_score')
                 continue
 
             # 2.5 更新substitute unit
-            substitute.exchange_max_greedy_score = cur_greedy_score
-            substitute.exchange_max_greedy_word = candidate
-            substitute.exchange_max_greedy_text = latest_candidate_text
-            tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
-            tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_greedy_text}')
+            substitute.exchange_max_decision_score = cur_greedy_score
+            substitute.exchange_max_decision_word = candidate
+            substitute.exchange_max_decision_text = latest_candidate_text
+            tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
+            tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_decision_text}')
             
             # 2.6 收集评价指标信息
             adv_text.adversary_info.adversary_accurary = candidate_probs[adv_text.origin_label]
@@ -109,23 +109,23 @@ class WordAttackerGreedy:
                 substitute.state = SubstituteState.WORD_REPLACED
                 adv_text.adversary_info.perturbated_token_count = adv_text.adversary_info.perturbated_token_count + 1
                 # 更新全局信息
-                adv_text.greedy_score = cur_greedy_score
+                adv_text.decision_score = cur_greedy_score
                 adv_text.adversary_info.attack_success = True
                 tools.show_log(f'**************ATTACK SUCCESS**************')
                 return True 
 
         # 环节3）判断候选词是否有效，检验约束条件，更新状态
         # 3.1 是否有出现了有效候词替代原始文本
-        if substitute.exchange_max_greedy_score <= substitute.initial_greedy_score:
+        if substitute.exchange_max_decision_score <= substitute.initial_decision_score:
             substitute.state = SubstituteState.WORD_INITIAL
-            tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_greedy_score} <= {substitute.initial_greedy_score}initial_greedy_score')
+            tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
             return False
 
         # 3.2 本轮产生了有效替代，更新全局greedy_score和substitute state
-        adv_text.greedy_score = substitute.exchange_max_greedy_score
+        adv_text.decision_score = substitute.exchange_max_decision_score
         substitute.state = SubstituteState.WORD_REPLACED
         adv_text.adversary_info.perturbated_token_count = adv_text.adversary_info.perturbated_token_count + 1
-        tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_greedy_word}, exchange_max_greedy_score = {substitute.exchange_max_greedy_score}')
+        tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
 
         return False
     

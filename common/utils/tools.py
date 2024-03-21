@@ -1,7 +1,7 @@
 
 from config import Pattern, ArgStyle
 from common import AdvText, TokenStyle, SubstituteState
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 
 def show_log(content):
@@ -30,7 +30,7 @@ def generate_latest_text(adv_text: AdvText) -> str:
             if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
                 display_list[index] = token_unit.substitute_unit.exchange_word
             elif token_unit.substitute_unit.state == SubstituteState.WORD_REPLACED:
-                display_list[index] = token_unit.substitute_unit.exchange_max_greedy_word
+                display_list[index] = token_unit.substitute_unit.exchange_max_decision_word
             else:
                 display_list[index] = token_unit.origin_token 
         else:
@@ -53,3 +53,19 @@ def generate_text(adv_text: AdvText) -> str:
             display_list[index] = token_unit.origin_token
     text = ''.join(display_list)
     return text
+
+'''
+    babelnet Can only be set to a(形容词)/v（动词）/n（名词）/r（副词）.
+'''
+def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
+    ltp_pos = ltp_pos.lower()
+    if ltp_pos.startswith('n') or ltp_pos == 'r':
+        return 'n'
+    elif ltp_pos == 'v':
+        return 'v'
+    elif ltp_pos == 'a':
+        return 'a'
+    elif ltp_pos == 'd':
+        return 'r'
+    else:
+        return None

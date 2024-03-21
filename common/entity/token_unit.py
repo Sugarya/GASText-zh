@@ -68,18 +68,22 @@ class SubstituteUnit((BaseEntity)):
 
         # 脆弱值
         self.fragile_score:float = None
-
-
-        # 替换前初始的概率值
-        self.initial_greedy_score:float = None
         # 替换过程，产生的当前替代词
         self.exchange_word:str = None
 
-        # 替换过程，记录下当前最大的贪心值
-        self.exchange_max_greedy_score:float = None
-        # 替换过程，产生的最大贪心值对应的替代词
-        self.exchange_max_greedy_word:str = None
-        # 替换过程，产生的最大贪心值对应的候选文本
-        self.exchange_max_greedy_text:str = None
+        # 替换前初始的决策值
+        self.initial_decision_score:float = None
+        # 替换过程，记录下当前最大的决策值
+        self.exchange_max_decision_score:float = None
+
+        # 替换过程，产生的最大决策对应的替代词
+        self.exchange_max_decision_word:str = None
+        # 替换过程，产生的最大决策对应的候选文本的标签
+        self.exchange_max_decision_label:int = None
+        # 替换过程，产生的最大决策对应的候选文本的概率
+        self.exchange_max_decision_prob:float = None
+        
+        # 替换过程，产生的最大决策值对应的候选文本
+        self.exchange_max_decision_text:str = None
        
 

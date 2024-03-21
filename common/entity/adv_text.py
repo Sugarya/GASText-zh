@@ -14,8 +14,8 @@ class AdvText(BaseEntity):
         self.origin_text:str = origin_text
         self.origin_probs:float = origin_probs
 
-        # 贪心选择的依据，分数值累计增大, 候选文本和原始文本的概率差值
-        self.greedy_score:float = 0
+        # 贪心选择的依据，决策分数值累计增大
+        self.decision_score:float = 0
         # 实时计算中，存储评价指标相关的信息
         self.adversary_info:AdversaryInfo = AdversaryInfo(origin_text, origin_label, origin_probs[origin_label])
         # 原始文本的每个token单元构成的列表

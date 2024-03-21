@@ -18,7 +18,7 @@ class SimMeasurer:
     '''
     def compute_cos_similarity(self, sentence1:str, sentence2:str) -> float:
         if not sentence1 and not sentence2:
-            return None
+            return 0
         
         embedding1 = self.__sim_model.encode(sentence1, convert_to_tensor=True)
         embedding2 = self.__sim_model.encode(sentence2, convert_to_tensor=True)

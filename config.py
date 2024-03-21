@@ -48,8 +48,10 @@ class Pattern:
     Masked_Bert = 'google-bert/bert-base-chinese'
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # 句子相似性
-    SENTENCE_SIMILARITY_THRESHOLD = 0.80
+    Sentence_Similarity_Threshold = 0.95
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
+    # 同义词集的数量上限
+    Synonym_Upper_Bound = 8
 
 
