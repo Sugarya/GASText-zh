@@ -10,7 +10,7 @@ elif len(DEVICES) == 1:
 class AlgoType(Enum):
     CWordAttacker = 1
     SWordFooler = 2
-    SWordMasked = 3
+    SWordBeam = 3
 
 class ArgStyle:
     NAME = '--style'
@@ -41,14 +41,14 @@ class ArgSpliter:
 '''
 class Pattern:
     Algorithm = AlgoType.SWordFooler
-    IsTargetAttack = True
-    Target_Label = 5
+    IsTargetAttack = False
+    Target_Label = None
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # 句子相似性
-    # Sentence_Similarity_Threshold = 0.95
+    Sentence_Similarity_Threshold = 0.95
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
     # 同义词集的数量上限

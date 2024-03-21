@@ -4,7 +4,7 @@ from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
 
-class WordFoolerGreedy:
+class WordFoolerSearch:
 
     def __init__(self, validator: Validator, substituter: Substituter) -> None:
         self.__validator = validator
@@ -113,7 +113,7 @@ class WordFoolerGreedy:
             tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
             return False
         
-        # # 3.2 TODO 是否满足语义词级别的相似性标准
+        # 3.2 TODO 是否满足语义词级别的相似性标准
         # sim_score = self.__validator.cosine_similarity(adv_text.origin_text, substitute.exchange_max_decision_text)
         # tools.show_log(f'**************__operate_substitute sim_score = {sim_score}')
         # if sim_score < Pattern.Sentence_Similarity_Threshold:

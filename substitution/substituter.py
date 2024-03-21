@@ -14,11 +14,11 @@ class Substituter:
 
     def __init__(self, type:AlgoType):
         self.__type = type
-        if self.__type == AlgoType.SWordFooler:
-            self.__babelnet_builder = BabelNetBuilder()
-        elif type == AlgoType.CWordAttacker:
+        if type == AlgoType.CWordAttacker:
             self.__transformer = CWordAttackerTransformer()
-        elif type == AlgoType.SWordMasked:
+        elif self.__type == AlgoType.SWordFooler:
+            self.__babelnet_builder = BabelNetBuilder()
+        else:
             self.__masked_builder = MaskedCandidateBuilder()
 
 
@@ -30,10 +30,9 @@ class Substituter:
             result = self.generate_cwordattacker_candidate(origin_word)
         elif self.__type == AlgoType.SWordFooler:
             result = self.generate_synonyms(origin_word, origin_pos)
-        elif self.__type == AlgoType.SWordMasked:
+        elif self.__type == AlgoType.SWordBeam:
             result = self.generate_masked_candidates(substitute_unit, adv_text)
         return result
-
     
     
     def generate_cwordattacker_candidate(self, word:str) -> List[str]:

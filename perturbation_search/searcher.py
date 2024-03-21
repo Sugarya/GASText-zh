@@ -4,8 +4,9 @@ from common import SubstituteUnit, AdvText, tools, SubstituteState, AdversaryInf
 from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
-from .cwordattacker_search import WordAttackerGreedy
-from .swordfooler_search import WordFoolerGreedy
+from .wordattacker_search import WordAttackerGreedy
+from .wordfooler_search import WordFoolerSearch
+from .wordbeam_search import WordBeamSearch
 
 class Searcher:
 
@@ -13,9 +14,9 @@ class Searcher:
         if Pattern.Algorithm == AlgoType.CWordAttacker:
             self.__greedy = WordAttackerGreedy(validator, substituter)
         elif Pattern.Algorithm == AlgoType.SWordFooler:
-            self.__greedy = WordFoolerGreedy(validator, substituter)
+            self.__greedy = WordFoolerSearch(validator, substituter)
         else:
-            self.__greedy = WordFoolerGreedy(validator, substituter)
+            self.__greedy = WordBeamSearch(validator, substituter)
         
     
     def perform(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
