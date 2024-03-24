@@ -20,7 +20,7 @@ class AdversaryInfo(BaseEntity):
         # 原始文本的原始标签的概率值
         self.origin_accurary:float = origin_accurary
         # 对抗样本的原始标签概率值
-        self.adversary_accurary:float = None
+        self.adversary_accurary:float = origin_accurary
 
         # 文本中token的总数
         self.text_token_count:int = None

@@ -54,7 +54,7 @@ class Separator:
         for index, token in enumerate(output.cws):
             pos = output.pos[index]
             # 生成待替换的原始词序列，即语义词序列
-            if pos in self.POS_LTP_FILTER:
+            if pos in self.POS_LTP_FILTER and len(token) >= 2:
                 cur_token_unit = TokenUnit(index, token, pos, TokenStyle.WORD_SUBSTITUTE)
                 adv_text.token_units[index] = cur_token_unit
                 substitute_units.append(cur_token_unit.substitute_unit)
