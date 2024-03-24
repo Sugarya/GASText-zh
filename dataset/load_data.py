@@ -1,4 +1,4 @@
-
+import os
 import csv
 from config import ArgStyle
 from common import tools
@@ -7,7 +7,8 @@ class DataLoader():
 
 
     def generate_examples(self, style_name):
-        file_path = f'./dataset/src/{ArgStyle.DatasetFile[style_name]}'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        file_path = f'{current_dir}/src/{ArgStyle.DatasetFile[style_name]}'
         tools.show_log(f'file_path = {file_path}')
 
         if style_name == ArgStyle.KEY_Shopping:

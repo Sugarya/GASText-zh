@@ -1,5 +1,5 @@
 
-from config import Pattern, ArgStyle
+from config import Pattern, ArgStyle, ArgAlgorithm, AlgoType
 from common import AdvText, TokenStyle, SubstituteState
 from typing import List, Tuple, Union
 
@@ -17,7 +17,7 @@ def format_example(example, style) -> Tuple[int, str]:
     if style == ArgStyle.KEY_Chinanews:
         label, text = int(example[0]) - 1, f'{example[1]}{example[2]}'
     else:
-        label, text = int(example[0]), f'{example[1] }'   
+        label, text = int(example[0]), f'{example[1]}'   
     return (label, text)
 
 '''
@@ -69,3 +69,27 @@ def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
         return 'r'
     else:
         return None
+    
+
+
+def __to_algorithm_type(type:str) -> AlgoType:
+    if type == ArgAlgorithm.KEY_CWordAttacker:
+        return AlgoType.CWordAttacker
+
+    elif type == ArgAlgorithm.KEY_SWordFooler:
+        return AlgoType.SWordFooler
+    
+    else:
+        return AlgoType.BeamWordFooler
+
+def setup_from_args(args):
+    if args.label:
+        Pattern.IsTargetAttack = True
+        Pattern.Target_Label = args.label
+        show_log(f'setup_from_args | IsTargetAttack{Pattern.IsTargetAttack} --> {Pattern.Target_Label}')
+
+    if args.algo:
+        Pattern.Algorithm = __to_algorithm_type(args.algo)
+        show_log(f'setup_from_args | {Pattern.Algorithm}')
+
+

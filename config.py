@@ -7,10 +7,14 @@ if len(DEVICES) == 0:
 elif len(DEVICES) == 1:
     DEVICES = DEVICES * 2
 
+class SeparatorType(Enum):
+    LTP = 1
+    JIE_BA = 2
+
 class AlgoType(Enum):
     CWordAttacker = 1
     SWordFooler = 2
-    SWordBeam = 3
+    BeamWordFooler = 3
 
 class ArgStyle:
     NAME = '--style'
@@ -23,24 +27,29 @@ class ArgStyle:
         KEY_Shopping:'partly_online_shopping_cats.csv',
         KEY_Chinanews:'partly_chinanews.csv',
     }
-
     Victim_Model = {
         KEY_Shopping:'Raychanan/bert-base-chinese-FineTuned-Binary-Best',
         KEY_Chinanews:'uer/roberta-base-finetuned-chinanews-chinese'
     }
 
-class ArgSpliter:
-    NAME = '--split'
-    KEY_LTP = 'ltp'
-    KEY_JIEBA = 'jieba'
+class ArgAlgorithm:
+    NAME = '--algo'
+    KEY_CWordAttacker = 'CWordAttacker'
+    KEY_SWordFooler = 'SWordFooler'
+    KEY_BeamWordFooler = 'AreaBeamFooler'
 
-    Default = KEY_LTP
+    Default = None
+
+class ArgLabel:
+    NAME = '--label'
+
+    Default = None
 
 '''
 运行模式
 '''
 class Pattern:
-    Algorithm = AlgoType.SWordFooler
+    Algorithm = None
     IsTargetAttack = False
     Target_Label = None
 

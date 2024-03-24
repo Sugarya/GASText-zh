@@ -30,7 +30,7 @@ class Substituter:
             result = self.generate_cwordattacker_candidate(origin_word)
         elif self.__type == AlgoType.SWordFooler:
             result = self.generate_synonyms(origin_word, origin_pos)
-        elif self.__type == AlgoType.SWordBeam:
+        elif self.__type == AlgoType.BeamWordFooler:
             result = self.generate_masked_candidates(substitute_unit, adv_text)
         return result
     

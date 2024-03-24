@@ -5,7 +5,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from arguement import parse_args
 from common import tools, SubstituteUnit, HuggingFaceWrapper
-from config import DEVICES, Pattern, ArgStyle, ArgSpliter
+from config import DEVICES, Pattern, ArgStyle, SeparatorType
 from dataset import DataLoader
 from segmentation import Separator
 from validation import Validator
@@ -17,6 +17,9 @@ from evaluation import Evaluator
 
 if __name__ == '__main__':
     args = parse_args()
+
+    # 处理来自命令行的参数
+    tools.setup_from_args(args)
 
     # 初始化数据集加载器
     data_loader = DataLoader()
@@ -37,7 +40,7 @@ if __name__ == '__main__':
     searcher = Searcher(validator, substituter)
 
     # 初始化分词器
-    separator = Separator(args.split)
+    separator = Separator(SeparatorType.LTP)
 
     # 初始化评价器
     evaluator = Evaluator()

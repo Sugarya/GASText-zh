@@ -29,7 +29,8 @@ class Evaluator():
 
 
     def __persist_to_file(self):
-        dir_file_path = f'{os.getcwd()}/output_result/{Pattern.Algorithm.name}'
+        current_parent_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), os.pardir)
+        dir_file_path = f'{current_parent_dir}/output_result/{Pattern.Algorithm.name}'
         exist = os.path.exists(dir_file_path)
         if not exist:
             os.makedirs(dir_file_path)
@@ -73,23 +74,24 @@ class Evaluator():
             query_times_sum += adversary_info.query_times
         
         validated_example_count = self.__evaluation_result.validated_example_count
-        self.__evaluation_result.ave_origin_accurary = origin_accurary_sum / validated_example_count
-        self.__evaluation_result.ave_adversary_accurary = adversary_accurary_sum / validated_example_count
-        self.__evaluation_result.ave_accurary_reduction = (origin_accurary_sum - adversary_accurary_sum) / validated_example_count
+        if validated_example_count != 0:
+            self.__evaluation_result.ave_origin_accurary = origin_accurary_sum / validated_example_count
+            self.__evaluation_result.ave_adversary_accurary = adversary_accurary_sum / validated_example_count
+            self.__evaluation_result.ave_accurary_reduction = (origin_accurary_sum - adversary_accurary_sum) / validated_example_count
+            self.__evaluation_result.attack_success_rate = attack_success_sum / validated_example_count
+            self.__evaluation_result.ave_sim_score = sim_score_sum / validated_example_count
+            self.__evaluation_result.ave_perturbated_count = perturbed_token_sum / validated_example_count
+            self.__evaluation_result.ave_query_times = query_times_sum / validated_example_count
 
+        if text_token_sum != 0:
+            self.__evaluation_result.ave_perturbated_rate = perturbed_token_sum / text_token_sum
+        
         self.__evaluation_result.attack_success_sum = attack_success_sum
-        self.__evaluation_result.attack_success_rate = attack_success_sum / validated_example_count
-        
-        self.__evaluation_result.ave_perturbated_count = perturbed_token_sum / validated_example_count
-        self.__evaluation_result.ave_perturbated_rate = perturbed_token_sum / text_token_sum
-        
-        self.__evaluation_result.ave_sim_score = sim_score_sum / validated_example_count
         if attack_success_sum != 0:
             self.__evaluation_result.ave_adversary_sim_score = success_similarity_score_sum / attack_success_sum 
         else:
             self.__evaluation_result.ave_adversary_sim_score = 0
         
-        self.__evaluation_result.ave_query_times = query_times_sum / validated_example_count
         self.__evaluation_result.target_attack = Pattern.IsTargetAttack
         self.__evaluation_result.target_label = Pattern.Target_Label
 

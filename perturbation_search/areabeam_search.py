@@ -4,7 +4,7 @@ from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
 
-class WordBeamSearch:
+class AreaBeamSearch:
 
     def __init__(self, validator: Validator, substituter: Substituter) -> None:
         self.__validator = validator
@@ -27,7 +27,7 @@ class WordBeamSearch:
             # 2）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
-            substitute_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
+            substitute_unit.candicates = self.__substituter.generate_masked_candidates(substitute_unit, adv_text)
             
             # 没有同义词集
             if len(substitute_unit.candicates) <= 2:

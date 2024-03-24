@@ -1,19 +1,21 @@
+from enum import Enum
 import torch
 from ltp import LTP
 import jieba
 import jieba.posseg as pseg
 from common import tools, AdvText, TokenUnit, TokenStyle, SubstituteUnit
 from typing import List
-from config import ArgSpliter
+from config import SeparatorType
+
 
 '''
     中文划分器
 '''
 class Separator:
 
-    def __init__(self, separator_type: str) -> None:
+    def __init__(self, separator_type: SeparatorType) -> None:
         self.__type = separator_type
-        if separator_type == ArgSpliter.KEY_LTP:
+        if separator_type == SeparatorType.LTP:
             self.__initial_ltp()
 
         self.POS_FILTER_BABELNET = set(['a', 'v', 'd', 'n', 'nd', 'nh','ni','nl','ns','nt'])
@@ -28,7 +30,7 @@ class Separator:
     
 
     def split(self, adv_text: AdvText) -> List[SubstituteUnit]:
-        if self.__type == ArgSpliter.KEY_LTP:
+        if self.__type == SeparatorType.LTP:
             tools.show_log(f'self.__type={self.__type}, split_by_ltp')
             return self.__split_by_ltp_for_babelnet(adv_text)
         else:

@@ -1,5 +1,5 @@
 import argparse
-from config import ArgStyle, ArgSpliter
+from config import ArgStyle, ArgAlgorithm, ArgLabel
 
 
 ArgumentDict = {}
@@ -13,11 +13,15 @@ def parse_args():
                            type = str,
                            help = "the style to be attacked")
     
-    parser.add_argument(ArgSpliter.NAME,
-                           default = ArgSpliter.Default,
+    parser.add_argument(ArgAlgorithm.NAME,
+                           default = ArgAlgorithm.Default,
                            type = str,
-                           help = "segmentation")
+                           help = "attack algorithm")
     
+    parser.add_argument(ArgLabel.NAME,
+                           default = ArgLabel.Default,
+                           type = int,
+                           help = "target label")    
 
     args = parser.parse_args()
     for key in list(args.__dict__.keys()):
