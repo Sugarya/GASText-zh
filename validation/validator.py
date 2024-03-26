@@ -19,7 +19,7 @@ class Validator:
     # 数据检查通过后，生成AdvText实例列表
     def generate_adv_texts(self, origin_examples, args_style) -> List[AdvText]:
         result_list = []
-        for example in origin_examples:
+        for index, example in enumerate(origin_examples):
             origin_label, text = tools.format_example(example, args_style)
             if Pattern.IsTargetAttack:
                 if Pattern.Target_Label == origin_label:
@@ -27,8 +27,10 @@ class Validator:
             probs = self.__victim_model.output_probs(text)
             probs_label = int(np.argmax(probs))
 
-            if probs_label == origin_label:  
+            if probs_label == origin_label:
                 result_list.append(AdvText(origin_label, text, probs))
+            else:
+                tools.show_log(f'第{index}个数据样本无效｜probs_label{probs_label}!={origin_label}origin_label')    
         return result_list
 
     def model_output(self, candidate_text:str) -> Tuple[List[float], int]:

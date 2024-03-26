@@ -3,7 +3,7 @@ from .base_entity import BaseEntity
 '''
     评价指标的统计结果
 '''
-class EvaluationResult(BaseEntity):
+class EvaluationInfo(BaseEntity):
 
     def __init__(self) -> None:
         # 原始样本的数量
@@ -26,8 +26,7 @@ class EvaluationResult(BaseEntity):
 
         # 对抗样本和原始样本的平均相似程度
         self.ave_sim_score:float = None
-        self.ave_adversary_sim_score:float = None
-
+        # 查询模型的次数
         self.ave_query_times:int = None
         
     def to_dict(self, obj):
@@ -43,6 +42,5 @@ class EvaluationResult(BaseEntity):
             'ave_perturbated_count':self.ave_perturbated_count,
             'ave_perturbated_rate':self.ave_perturbated_rate,
             'ave_sim_score':self.ave_sim_score,
-            'ave_adversary_sim_score':self.ave_adversary_sim_score,
             'ave_query_times':self.ave_query_times
         }

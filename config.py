@@ -18,18 +18,31 @@ class AlgoType(Enum):
 
 class ArgStyle:
     NAME = '--style'
-    KEY_Shopping = 'bert-shopping'
-    KEY_Chinanews = 'roberta-chinanews'
 
-    Default = KEY_Shopping
+    Shopping = 'shopping'
+    Chinanews = 'chinanews'
+    BERT = 'bert'
+    RoBERTa = 'roberta'
+    DEBUG = 'debug'
 
-    DatasetFile = {
-        KEY_Shopping:'partly_online_shopping_cats.csv',
-        KEY_Chinanews:'partly_chinanews.csv',
+    BERT_Shopping = f'{BERT}-{Shopping}'
+    RoBERTa_Chinanews = f'{RoBERTa}-{Chinanews}'
+    DEBUG_BERT_Shopping = f'{DEBUG}-{BERT}-{Shopping}'
+    DEBUG_RoBERTa_Chinanews = f'{DEBUG}-{RoBERTa}-{Chinanews}'
+
+    Default = DEBUG_RoBERTa_Chinanews
+
+    Dataset_File = {
+        BERT_Shopping:'partly_online_shopping_cats.csv',
+        RoBERTa_Chinanews:'partly_chinanews.csv',
+        DEBUG_BERT_Shopping:'debug_online_shopping_cats.csv',
+        DEBUG_RoBERTa_Chinanews:'debug_chinanews.csv'
     }
     Victim_Model = {
-        KEY_Shopping:'Raychanan/bert-base-chinese-FineTuned-Binary-Best',
-        KEY_Chinanews:'uer/roberta-base-finetuned-chinanews-chinese'
+        BERT_Shopping:'Raychanan/bert-base-chinese-FineTuned-Binary-Best',
+        RoBERTa_Chinanews:'uer/roberta-base-finetuned-chinanews-chinese',
+        DEBUG_BERT_Shopping:'Raychanan/bert-base-chinese-FineTuned-Binary-Best',
+        DEBUG_RoBERTa_Chinanews:'uer/roberta-base-finetuned-chinanews-chinese',
     }
 
 class ArgAlgorithm:
@@ -38,7 +51,8 @@ class ArgAlgorithm:
     KEY_SWordFooler = 'SWordFooler'
     KEY_BeamWordFooler = 'AreaBeamFooler'
 
-    Default = None
+    Default = KEY_SWordFooler
+    # Default = None
 
 class ArgLabel:
     NAME = '--label'

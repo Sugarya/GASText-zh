@@ -14,10 +14,10 @@ def show_log(content):
 '''
 def format_example(example, style) -> Tuple[int, str]:
     label, text = None, None
-    if style == ArgStyle.KEY_Chinanews:
+    if ArgStyle.Chinanews in style:
         label, text = int(example[0]) - 1, f'{example[1]}{example[2]}'
     else:
-        label, text = int(example[0]), f'{example[1]}'   
+        label, text = int(example[0]), f'{example[1]}'
     return (label, text)
 
 '''

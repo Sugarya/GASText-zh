@@ -8,12 +8,12 @@ class DataLoader():
 
     def generate_examples(self, style_name):
         current_dir = os.path.dirname(os.path.abspath(__file__))
-        file_path = f'{current_dir}/src/{ArgStyle.DatasetFile[style_name]}'
+        file_path = f'{current_dir}/src/{ArgStyle.Dataset_File[style_name]}'
         tools.show_log(f'file_path = {file_path}')
 
-        if style_name == ArgStyle.KEY_Shopping:
+        if ArgStyle.Shopping in style_name:
             examples = self.__read_corpus_of_online_shopping(file_path)
-        elif style_name == ArgStyle.KEY_Chinanews:
+        elif ArgStyle.Chinanews in style_name:
             examples = self.__read_corpus_of_chinanews(file_path)
         else:
             examples = self.__read_corpus(file_path)
