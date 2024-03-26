@@ -154,7 +154,6 @@ class WordFoolerSearch:
             if substitute.state == SubstituteState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
-            tools.show_log(f'compute fragile score-{index}, fragile_score = {substitute.fragile_score}')
         
         # 2 sort排序  
         result_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))

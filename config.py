@@ -59,13 +59,24 @@ class ArgLabel:
 
     Default = None
 
+class ArgAblation:
+    NAME = '--ablation'
+
+    Fragile_DS = 1 # 脆弱值计算
+    Deletion = 2 # 消去删除扰动
+    Maintain = 3 # 保持原始词
+
+    Default = None
+
+
 '''
 运行模式
 '''
 class Pattern:
-    Algorithm = None
+    Algorithm:AlgoType = None
     IsTargetAttack = False
-    Target_Label = None
+    Target_Label:int = None
+    Ablation_Type:int = None
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'

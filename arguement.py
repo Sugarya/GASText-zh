@@ -1,5 +1,5 @@
 import argparse
-from config import ArgStyle, ArgAlgorithm, ArgLabel
+from config import ArgStyle, ArgAlgorithm, ArgLabel, ArgAblation
 
 
 ArgumentDict = {}
@@ -21,7 +21,12 @@ def parse_args():
     parser.add_argument(ArgLabel.NAME,
                            default = ArgLabel.Default,
                            type = int,
-                           help = "target label")    
+                           help = "target label")
+    
+    parser.add_argument(ArgAblation.NAME,
+                           default = ArgAblation.Default,
+                           type = int,
+                           help = "ablation type")
 
     args = parser.parse_args()
     for key in list(args.__dict__.keys()):

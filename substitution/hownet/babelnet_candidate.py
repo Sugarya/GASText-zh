@@ -1,7 +1,7 @@
 from typing import List
 import OpenHowNet
 from common import tools
-from config import Pattern
+from config import Pattern, ArgAblation
 
 class LANGUAGE:
     ZH = 'zh'
@@ -29,7 +29,17 @@ class BabelNetBuilder:
         TODO 需要性能优化
     '''
     def __synonyms(self, lemma:str, word_pos:str=None):
-        candidates = set([lemma, ''])
+        candidates = None
+        if Pattern.Ablation_Type == ArgAblation.Deletion:
+            candidates = set([lemma])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        elif Pattern.Ablation_Type == ArgAblation.Maintain:
+            candidates = set([''])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        else:
+            candidates = set([lemma, ''])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)

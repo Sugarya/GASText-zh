@@ -92,4 +92,5 @@ def setup_from_args(args):
         Pattern.Algorithm = __to_algorithm_type(args.algo)
         show_log(f'setup_from_args | {Pattern.Algorithm}')
 
-
+    if args.ablation:
+        Pattern.Ablation_Type = args.ablation

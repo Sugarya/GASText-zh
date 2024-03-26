@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List, Tuple
-from config import Pattern, AlgoType
+from config import Pattern, AlgoType, ArgAblation
 
 from common.model import HuggingFaceWrapper
 from common.entity import SubstituteUnit, SubstituteState, TokenStyle,AdvText
@@ -51,8 +51,13 @@ class Validator:
     def operate_fragile(self, substitute: SubstituteUnit, adv_text: AdvText):
         if Pattern.Algorithm == AlgoType.CWordAttacker:
             self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
-        elif Pattern.Algorithm == AlgoType.SWordFooler:
-            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+        elif Pattern.Algorithm == AlgoType.SWordFooler:                
+            if Pattern.Ablation_Type == ArgAblation.Fragile_DS:
+                self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
+                tools.show_log(f'compute fragile by DS, fragile_score = {substitute.fragile_score}')
+            else:
+                self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+                tools.show_log(f'compute ADS fragile, fragile_score = {substitute.fragile_score}')
         else:
             self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
 
