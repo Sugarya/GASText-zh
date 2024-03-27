@@ -22,6 +22,7 @@ class BabelNetBuilder:
         synonym_list = self.__synonyms(word, pos)
         return synonym_list
 
+
     
     '''
         pos(`str`): limitation on the result. Can be set to a(形容词)/v（动词）/n（名词）/r（副词）.
@@ -45,25 +46,45 @@ class BabelNetBuilder:
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
             for index, synonyms in enumerate(synonyms_list):
                 tools.show_log(f'--{index}--, synonyms.zh_synonyms = {synonyms.zh_synonyms}')
-                candidates.update(synonyms.zh_synonyms)
+                candidates.update(synonyms.zh_synonyms) 
         candidate_list = list(candidates)
-        tools.show_log(f'BabelNetBuilder ｜ candidate_list of {lemma}-{word_pos} = {candidate_list}')      
+        
+        if Pattern.Substitute_Size and len(candidate_list) > Pattern.Substitute_Size:
+            candidate_list = candidate_list[:Pattern.Substitute_Size]
+        
+        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size} ｜ candidate_list of {lemma}-{word_pos} = {candidate_list}')
         return candidate_list
     
-    # def __nearest_words(self, lemma:str, word_pos:str=None):
-    #     candidates = set([lemma, ''])
-    #     word_pos = tools.ltp_to_babelnet_pos(word_pos)
-    #     if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
-    #         try:
-    #             synonyms_list = self.__hownet_dict_advanced.get_nearest_words(lemma, LANGUAGE.ZH, K = 6, merge=True)
-    #             if len(synonyms_list) > 0:
-    #                 candidates.update(synonyms_list)
-    #         except (RuntimeError, TypeError):
-    #             pass
-    #     result_list = list(candidates)
-    #     tools.show_log(f'BabelNetBuilder ｜ sememes words of {lemma}-{word_pos} = {result_list}')      
-    #     return result_list
+    def __synonyms_by_similarity_score(self, lemma:str, word_pos:str=None):
+        candidates = self.__initial_candidates(lemma)
+        
+        word_pos = tools.ltp_to_babelnet_pos(word_pos)
+        if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
+            synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
+            for index, synonyms in enumerate(synonyms_list):
+                tools.show_log(f'--{index}--, synonyms.zh_synonyms = {synonyms.zh_synonyms}')
+                candidates.update(synonyms.zh_synonyms) 
+        candidate_list = list(candidates)
+        
+        if Pattern.Substitute_Size and len(candidate_list) > Pattern.Substitute_Size:
+            candidate_list = candidate_list[:Pattern.Substitute_Size]
+        
+        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size} ｜ candidate_list of {lemma}-{word_pos} = {candidate_list}')
+        return candidate_list
     
     def __word_similarity(self, word:str, word2:str):
         word_sim = self.__hownet_dict_advanced.calculate_word_similarity(word, word2)
         return word_sim
+    
+    def __initial_candidates(self, lemma:str) -> List:
+        candidates = None
+        if Pattern.Ablation_Type == ArgAblation.Deletion:
+            candidates = set([lemma])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        elif Pattern.Ablation_Type == ArgAblation.Maintain:
+            candidates = set([''])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        else:
+            candidates = set([lemma, ''])
+            tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}')
+        return candidates

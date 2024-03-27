@@ -94,3 +94,9 @@ def setup_from_args(args):
 
     if args.ablation:
         Pattern.Ablation_Type = args.ablation
+
+    if args.postfix:
+        Pattern.Postfix = args.postfix
+
+    if args.subsize:
+        Pattern.Substitute_Size = args.subsize

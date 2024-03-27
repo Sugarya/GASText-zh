@@ -32,11 +32,11 @@ class ArgStyle:
 
     Default = DEBUG_RoBERTa_Chinanews
 
-    Dataset_File = {
-        BERT_Shopping:'partly_online_shopping_cats.csv',
-        RoBERTa_Chinanews:'partly_chinanews3.csv',
-        DEBUG_BERT_Shopping:'debug_online_shopping_cats.csv',
-        DEBUG_RoBERTa_Chinanews:'debug_chinanews.csv'
+    Dataset_File_Name = {
+        BERT_Shopping:'partly_online_shopping_cats',
+        RoBERTa_Chinanews:'partly_chinanews3',
+        DEBUG_BERT_Shopping:'debug_online_shopping_cats',
+        DEBUG_RoBERTa_Chinanews:'debug_chinanews'
     }
     Victim_Model = {
         BERT_Shopping:'Raychanan/bert-base-chinese-FineTuned-Binary-Best',
@@ -69,6 +69,21 @@ class ArgAblation:
 
     Default = None
 
+class ArgPostfix:
+    NAME = '--postfix'
+
+    Long = 'long'
+    Short = 'short'
+    Target = 'target'
+
+    Default = None
+
+class ArgSubstituteSize:
+    NAME = '--subsize'
+
+    Default = None
+
+
 
 '''
 运行模式
@@ -78,6 +93,9 @@ class Pattern:
     IsTargetAttack = False
     Target_Label:int = None
     Ablation_Type:int = None
+
+    Substitute_Size:int = None
+    Postfix:str = None
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'
