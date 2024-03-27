@@ -73,14 +73,14 @@ def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
 
 
 def __to_algorithm_type(type:str) -> AlgoType:
-    if type == ArgAlgorithm.KEY_CWordAttacker:
+    if type == ArgAlgorithm.CWordAttacker:
         return AlgoType.CWordAttacker
 
-    elif type == ArgAlgorithm.KEY_SWordFooler:
+    elif type == ArgAlgorithm.SWordFooler:
         return AlgoType.SWordFooler
     
     else:
-        return AlgoType.BeamWordFooler
+        return AlgoType.MaskedBeamFooler
 
 def setup_from_args(args):
     if args.label:

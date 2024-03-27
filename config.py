@@ -14,7 +14,7 @@ class SeparatorType(Enum):
 class AlgoType(Enum):
     CWordAttacker = 1
     SWordFooler = 2
-    BeamWordFooler = 3
+    MaskedBeamFooler = 3
 
 class ArgStyle:
     NAME = '--style'
@@ -30,7 +30,7 @@ class ArgStyle:
     DEBUG_BERT_Shopping = f'{DEBUG}-{BERT}-{Shopping}'
     DEBUG_RoBERTa_Chinanews = f'{DEBUG}-{RoBERTa}-{Chinanews}'
 
-    Default = DEBUG_RoBERTa_Chinanews
+    Default = DEBUG_BERT_Shopping
 
     Dataset_File_Name = {
         BERT_Shopping:'partly_online_shopping_cats',
@@ -47,11 +47,11 @@ class ArgStyle:
 
 class ArgAlgorithm:
     NAME = '--algo'
-    KEY_CWordAttacker = 'CWordAttacker'
-    KEY_SWordFooler = 'SWordFooler'
-    KEY_BeamWordFooler = 'AreaBeamFooler'
+    CWordAttacker = 'CWordAttacker'
+    SWordFooler = 'SWordFooler'
+    MaskedBeamFooler = 'MaskedBeamFooler'
 
-    Default = KEY_SWordFooler
+    Default = SWordFooler
     # Default = None
 
 class ArgLabel:
@@ -64,8 +64,7 @@ class ArgAblation:
 
     Fragile_DS = 1 # 脆弱值计算
     Deletion = 2 # 消去删除扰动
-    Maintain = 3 # 保持原始词
-    Substitute = 4 # 替换动作
+    Substitute_Via_Others = 3 # 替换动作
 
     Default = None
 

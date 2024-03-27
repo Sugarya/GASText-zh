@@ -31,7 +31,7 @@ class Substituter:
             result = self.generate_cwordattacker_candidate(origin_word)
         elif self.__type == AlgoType.SWordFooler:
             result = self.generate_synonyms(origin_word, origin_pos)
-        elif self.__type == AlgoType.BeamWordFooler:
+        elif self.__type == AlgoType.MaskedBeamFooler:
             result = self.generate_masked_candidates(substitute_unit, adv_text)
         return result
     
@@ -47,7 +47,7 @@ class Substituter:
     #     return self.__sememe_builder.sememes(word) 
 
     def generate_masked_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
-        candidate_list = self.__masked_builder.candidates(substitute_unit, adv_text)
+        candidate_list = self.__masked_builder.candidates_by_sim_score(substitute_unit, adv_text)
         return candidate_list
 
         

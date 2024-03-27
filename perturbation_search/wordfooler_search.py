@@ -23,7 +23,7 @@ class WordFoolerSearch:
             # 2）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** Ablation_Type = {Pattern.Ablation_Type}, origin_word = {origin_word} -> pos = {origin_pos}')
-            if Pattern.Ablation_Type == ArgAblation.Substitute:
+            if Pattern.Ablation_Type == ArgAblation.Substitute_Via_Others:
                 substitute_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
             else:
                 substitute_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
