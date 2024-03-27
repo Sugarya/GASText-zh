@@ -31,16 +31,16 @@ class EvaluationInfo(BaseEntity):
         
     def to_dict(self, obj):
         return {
-            'validated_example_count':self.validated_example_count,
             'target_attack':self.target_attack,
             'target_label':self.target_label,
+            'validated_example_count':self.validated_example_count,
+            'attack_success_sum':self.attack_success_sum,
+            'attack_success_rate':self.attack_success_rate,
+            'ave_sim_score':self.ave_sim_score,
             'ave_origin_accurary':self.ave_origin_accurary,
             'ave_adversary_accurary':self.ave_adversary_accurary,
             'ave_accurary_reduction':self.ave_accurary_reduction,
-            'attack_success_sum':self.attack_success_sum,
-            'attack_success_rate':self.attack_success_rate,
             'ave_perturbated_count':self.ave_perturbated_count,
             'ave_perturbated_rate':self.ave_perturbated_rate,
-            'ave_sim_score':self.ave_sim_score,
             'ave_query_times':self.ave_query_times
         }

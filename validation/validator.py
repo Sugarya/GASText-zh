@@ -18,6 +18,7 @@ class Validator:
 
     # 数据检查通过后，生成AdvText实例列表
     def generate_adv_texts(self, origin_examples, args_style) -> List[AdvText]:
+        tools.show_log(f'Now, generate adv_texts object') 
         result_list = []
         for index, example in enumerate(origin_examples):
             origin_label, text = tools.format_example(example, args_style)
