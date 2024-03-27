@@ -65,6 +65,7 @@ class ArgAblation:
     Fragile_DS = 1 # 脆弱值计算
     Deletion = 2 # 消去删除扰动
     Maintain = 3 # 保持原始词
+    Substitute = 4 # 替换动作
 
     Default = None
 

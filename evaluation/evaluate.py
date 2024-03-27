@@ -37,7 +37,7 @@ class Evaluator():
         
         arg_style = ArgumentDict['style']
         localtime = time.localtime(time.time())
-        date_time = f'{localtime[1]}{localtime[2]}_{localtime[3]}{localtime[4]}_{localtime[5]}'
+        date_time = f'{localtime[1]}{localtime[2]}_{localtime[3]}_{localtime[4]}_{localtime[5]}'
         file_path = f'{dir_file_path}/{arg_style}_{date_time}.json'
         tools.show_log(f'The file path of experiment result is {file_path}')
         with open(file_path, 'w', encoding='utf-8', errors='replace') as f:
