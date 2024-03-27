@@ -61,10 +61,10 @@ class Evaluator():
         query_times_sum = 0
         
         for index, adversary_info in enumerate(self.__adversary_infos):
-            origin_accurary_sum += adversary_info.origin_accurary
-            adversary_accurary_sum += adversary_info.adversary_accurary
-
             if adversary_info.attack_success:
+                origin_accurary_sum += adversary_info.origin_accurary
+                adversary_accurary_sum += adversary_info.adversary_accurary
+                
                 attack_success_sum += 1
                 sim_score_sum += adversary_info.similarity
                 perturbed_token_sum += adversary_info.perturbated_token_count

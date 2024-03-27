@@ -34,7 +34,7 @@ class ArgStyle:
 
     Dataset_File = {
         BERT_Shopping:'partly_online_shopping_cats.csv',
-        RoBERTa_Chinanews:'partly_chinanews.csv',
+        RoBERTa_Chinanews:'partly_chinanews2.csv',
         DEBUG_BERT_Shopping:'debug_online_shopping_cats.csv',
         DEBUG_RoBERTa_Chinanews:'debug_chinanews.csv'
     }
