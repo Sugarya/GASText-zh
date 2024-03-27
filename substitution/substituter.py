@@ -18,6 +18,7 @@ class Substituter:
             self.__transformer = CWordAttackerTransformer()
         elif self.__type == AlgoType.SWordFooler:
             self.__babelnet_builder = BabelNetBuilder()
+            self.__transformer = CWordAttackerTransformer()
         else:
             self.__masked_builder = MaskedCandidateBuilder()
 
