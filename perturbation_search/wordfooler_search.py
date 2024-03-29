@@ -26,7 +26,7 @@ class WordFoolerSearch:
             if Pattern.Ablation_Type == ArgAblation.Substitute_Via_Others:
                 substitute_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
             else:
-                substitute_unit.candicates = self.__substituter.generate_synonyms(origin_word, origin_pos)
+                substitute_unit.candicates = self.__substituter.generate_hownet_synonyms(origin_word, origin_pos)
             
             # 没有同义词集
             if not Pattern.Ablation_Type or Pattern.Ablation_Type == ArgAblation.Fragile_DS:

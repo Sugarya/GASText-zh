@@ -83,7 +83,7 @@ def __to_algorithm_type(type:str) -> AlgoType:
         return AlgoType.MaskedBeamFooler
 
 def setup_from_args(args):
-    if args.label:
+    if args.label or args.label == 0:
         Pattern.IsTargetAttack = True
         Pattern.Target_Label = args.label
         show_log(f'setup_from_args | IsTargetAttack{Pattern.IsTargetAttack} --> {Pattern.Target_Label}')

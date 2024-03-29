@@ -1,5 +1,6 @@
 from typing import List
-import OpenHowNet
+from OpenHowNet import HowNetDict
+
 from common import tools
 from config import Pattern, ArgAblation
 
@@ -13,10 +14,8 @@ class LANGUAGE:
 '''
 class BabelNetBuilder:
 
-    def __init__(self) -> None:
-        self.__hownet_dict_advanced = OpenHowNet.HowNetDict()
-        self.__hownet_dict_advanced.initialize_babelnet_dict()
-        self.__hownet_dict_advanced.initialize_similarity_calculation()
+    def __init__(self, hownet_dict_advanced:HowNetDict) -> None:
+        self.__hownet_dict_advanced = hownet_dict_advanced
 
 
     def synonyms(self, word:str, pos:str):
@@ -51,7 +50,7 @@ class BabelNetBuilder:
         tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size} ｜ candidate_list of {lemma}-{word_pos} = {candidate_list}')
         return candidate_list
     
-    def __synonyms_by_similarity_score(self, lemma:str, word_pos:str=None):
+    def synonyms_by_similarity_score(self, lemma:str, word_pos:str=None):
         syn_set = set()
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
@@ -61,7 +60,7 @@ class BabelNetBuilder:
         tools.show_log(f'all zh_synonyms = {syn_set}')
 
         syn_tuple_set = map(lambda t:(self.__word_similarity(lemma, t), t), syn_set)
-        candidate_tuple_set = filter(lambda t:t[0]>0.9, syn_tuple_set)
+        candidate_tuple_set = filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_tuple_set)
         candidate_tuple_list = list(sorted(candidate_tuple_set, key=lambda t:t[0], reverse=True))
         if Pattern.Ablation_Type != ArgAblation.Deletion:
             candidate_tuple_list.insert(0, (1, ''))

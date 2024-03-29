@@ -1,15 +1,15 @@
 
 from transformers import AutoTokenizer, AutoModelForMaskedLM, pipeline
-import OpenHowNet
-from config import *
+from config import Pattern
 from common import tools, SubstituteUnit, AdvText, BertMaskedModelWrapper, SubstituteState
 from typing import List
+from hownet import HowNetDict
 
 class MaskedCandidateBuilder:
 
-    def __init__(self) -> None:
+    def __init__(self, hownet_dict_advanced:HowNetDict) -> None:
         self.__bert_masked_moder = BertMaskedModelWrapper()
-        self.__hownet_dict_advanced = OpenHowNet.HowNetDict(init_sim=True)
+        self.__hownet_dict_advanced = hownet_dict_advanced
         
 
     def candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
@@ -35,7 +35,7 @@ class MaskedCandidateBuilder:
         tools.show_log(f'masked_list = {masked_list}')
 
         masked_tuple_list = map(lambda t:(self.__word_similarity(substitute_unit.origin_word,t), t), masked_list)
-        masked_tuple_list = filter(lambda x:x[0]>0.9, masked_tuple_list)
+        masked_tuple_list = filter(lambda x:x[0]>Pattern.Word_Similarity_Threshold, masked_tuple_list)
         sorted_tuple_list = sorted(masked_tuple_list, key=lambda t:t[0], reverse=True)
         tools.show_log(f'sorted_tuple_list = {sorted_tuple_list}')
         

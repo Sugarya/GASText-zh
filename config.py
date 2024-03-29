@@ -101,9 +101,11 @@ class Pattern:
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # 句子相似性
     Sentence_Similarity_Threshold = 0.95
+    # 同义词和原始词的相似性上限
+    Word_Similarity_Threshold  = 0.8
+
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
-    # 同义词集的数量上限
-    # Synonym_Upper_Bound = 8
+    
 
 
