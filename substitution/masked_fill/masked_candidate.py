@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForMaskedLM, pipeline
 from config import Pattern
 from common import tools, SubstituteUnit, AdvText, BertMaskedModelWrapper, SubstituteState
 from typing import List
-from hownet import HowNetDict
+from OpenHowNet import HowNetDict
 
 class MaskedCandidateBuilder:
 
