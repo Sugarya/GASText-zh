@@ -12,7 +12,7 @@ class AdvText(BaseEntity):
     def __init__(self, origin_label:int, origin_text:str, origin_probs:List[float]):
         self.origin_label:int = origin_label
         self.origin_text:str = origin_text
-        self.origin_probs:float = origin_probs
+        self.origin_probs:List[float] = origin_probs
 
         # 贪心选择的依据，决策分数值累计增大
         self.decision_score:float = 0

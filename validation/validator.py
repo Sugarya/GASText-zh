@@ -47,7 +47,7 @@ class Validator:
         return sim_score
 
     '''
-        TODO 按不同的策略
+        按不同的策略
     '''
     def operate_fragile(self, substitute: SubstituteUnit, adv_text: AdvText):
         if Pattern.Algorithm == AlgoType.CWordAttacker:
@@ -60,7 +60,8 @@ class Validator:
                 self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
                 tools.show_log(f'compute ADS fragile, fragile_score = {substitute.fragile_score}')
         else:
-            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+            self.__fragile_measurer.operate_adas_fragile(substitute, adv_text)
+            tools.show_log(f'compute ADAS fragile, fragile_score = {substitute.fragile_score}')
 
 
     # 当搜索结束时（对抗攻击可能成功，可能失败），收集评价指标信息

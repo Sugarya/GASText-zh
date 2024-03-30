@@ -51,8 +51,8 @@ class ArgAlgorithm:
     SWordFooler = 'SWordFooler'
     MaskedBeamFooler = 'MaskedBeamFooler'
 
-    Default = SWordFooler
-    # Default = None
+    Default = MaskedBeamFooler
+
 
 class ArgLabel:
     NAME = '--label'

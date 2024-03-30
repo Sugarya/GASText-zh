@@ -27,7 +27,7 @@ class MaskedBeamSearch:
             # 2）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
-            substitute_unit.candicates = self.__substituter.generate_masked_candidates(substitute_unit, adv_text)
+            substitute_unit.candicates = self.__substituter.generate_hybrid_candidates(substitute_unit, adv_text)
             
             # 没有同义词集
             if len(substitute_unit.candicates) <= 2:
@@ -157,7 +157,6 @@ class MaskedBeamSearch:
             if substitute.state == SubstituteState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
-            tools.show_log(f'compute fragile score-{index}, fragile_score = {substitute.fragile_score}')
         
         # 2 sort按脆弱值大小降序  
         sorted_substitute_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))

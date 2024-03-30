@@ -32,7 +32,7 @@ class Separator:
     def split(self, adv_text: AdvText) -> List[SubstituteUnit]:
         if self.__type == SeparatorType.LTP:
             tools.show_log(f'self.__type={self.__type}, split_by_ltp')
-            return self.__split_by_ltp_for_babelnet(adv_text)
+            return self.__split_by_ltp(adv_text)
         else:
             tools.show_log(f'self.__type={self.__type}, split_by_jieba')
             return self.__split_by_jieba(adv_text)

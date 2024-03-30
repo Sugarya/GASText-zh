@@ -25,7 +25,7 @@ class MaskedCandidateBuilder:
         return candidate_list
     
 
-    def candidates_by_sim_score(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def candidates_sortedby_sim_score(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
         substitute_unit.exchange_word = BertMaskedModelWrapper.MASK_TOKEN
         substitute_unit.state = SubstituteState.WORD_REPLACING
         masked_text = tools.generate_text(adv_text)

@@ -39,7 +39,7 @@ def generate_latest_text(adv_text: AdvText) -> str:
     return text
 
 '''
-    生成一个词元变动的文本，比如Masked场景
+    对WORD_REPLACING状态词元替换，比如Masked场景
 '''
 def generate_text(adv_text: AdvText) -> str:
     display_list = [None] * len(adv_text.token_units)
@@ -48,11 +48,28 @@ def generate_text(adv_text: AdvText) -> str:
             if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
                 display_list[index] = token_unit.substitute_unit.exchange_word
             else:
-                display_list[index] = token_unit.origin_token   
+                display_list[index] = token_unit.origin_token
         else:
             display_list[index] = token_unit.origin_token
     text = ''.join(display_list)
     return text
+
+"""
+    状态为WORD_SUBSTITUTE的词元设置为空字符，得到文本。比如用于ADAS策略计算脆弱值
+"""
+def generate_incomplete_text(adv_text: AdvText) -> str:
+    display_list = [None] * len(adv_text.token_units)
+    for index, token_unit in enumerate(adv_text.token_units):                
+        if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
+            if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
+                display_list[index] = token_unit.origin_token
+            else:
+                display_list[index] = ''
+        else:
+            display_list[index] = token_unit.origin_token
+    text = ''.join(display_list)
+    return text
+
 
 '''
     babelnet Can only be set to a(形容词)/v（动词）/n（名词）/r（副词）.

@@ -1,15 +1,13 @@
 from typing import List
 import OpenHowNet
-from enum import Enum
-from .hownet import BabelNetBuilder, SememeBuilder
+from .hownet import BabelNetBuilder
 from .masked_fill import MaskedCandidateBuilder
 from .transformer import CWordAttackerTransformer
-from common import tools, SubstituteUnit, AdvText, BertMaskedModelWrapper, SubstituteState
-from config import AlgoType
-
+from common import tools, SubstituteUnit, AdvText
+from config import AlgoType, Pattern
 
 '''
-    使用不同的方式生成替代词，如同义词，语言淹码模型，拼音，繁体字等
+    使用不同的方式生成替换词集
 '''
 class Substituter:
 
@@ -50,11 +48,22 @@ class Substituter:
         candidate_list = self.__masked_builder.candidates(substitute_unit, adv_text)
         return candidate_list
 
-        
+    """
+        混合hownet和masked生成的同义词集。混合规则：
+        1)masked候选集最高优 2)剩余按相似分数排序 
+        3）相似分数相同的，按同义词带有原始词的字且和原始词相同字数的优先 > 同义词带有原始词的字 > 和原始词相同字数
+    """
     def generate_hybrid_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
-        
-        sorted_masked_candidates = self.__masked_builder.candidates_by_sim_score(substitute_unit, adv_text)
-        
+        sorted_masked_candidates = self.__masked_builder.candidates_sortedby_sim_score(substitute_unit, adv_text)
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
-        sorted_babel_candidates = self.__babelnet_builder.synonyms_by_similarity_score(origin_word, origin_pos)
-        
+        sorted_babel_candidates = self.__babelnet_builder.synonyms_sortedby_sim_score(origin_word, origin_pos)
+
+        for babel_candidate in sorted_babel_candidates:
+            if not babel_candidate in sorted_masked_candidates:
+                sorted_masked_candidates.append(babel_candidate)
+
+        if Pattern.Substitute_Size and len(sorted_masked_candidates) > Pattern.Substitute_Size:
+            sorted_masked_candidates = sorted_masked_candidates[:Pattern.Substitute_Size]
+
+        tools.show_log(f'hybrid_candidates = {sorted_masked_candidates}')
+        return sorted_masked_candidates
