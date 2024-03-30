@@ -102,7 +102,7 @@ class Pattern:
     # 句子相似性
     Sentence_Similarity_Threshold = 0.95
     # 同义词和原始词的相似性上限
-    Word_Similarity_Threshold  = 0.8
+    Word_Similarity_Threshold  = 0.815
 
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2

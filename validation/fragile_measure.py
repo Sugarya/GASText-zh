@@ -68,6 +68,6 @@ class FragileMeasurer:
         probs = self.__victim_model.output_probs(incomplete_text)
         ads_score = self.__compute_ads_score(adv_text.origin_probs, probs)
         tools.show_log(f'adas part1 score = {substitute.fragile_score}, part2 score = {ads_score}')
-        C1 = 0.5
-        C2 = 0.5
+        C1 = 0.9
+        C2 = 0.1
         substitute.fragile_score = C1*substitute.fragile_score + C2*ads_score

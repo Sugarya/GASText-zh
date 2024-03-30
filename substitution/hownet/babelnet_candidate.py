@@ -48,7 +48,8 @@ class BabelNetBuilder:
 
 
     def synonyms_sortedby_sim_score(self, lemma:str, word_pos:str=None) -> List[str]:
-        syn_set = set([lemma])
+        # 1）从babelnet中获得同义词集
+        syn_set = set()
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
@@ -56,20 +57,46 @@ class BabelNetBuilder:
                 syn_set.update(synonyms.zh_synonyms)
         tools.show_log(f'all zh_synonyms = {syn_set}')
 
-        syn_tuple_set = map(lambda t:(self.__word_similarity(lemma, t), t), syn_set)
-        candidate_tuple_set = filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_tuple_set)
-        candidate_tuple_list = list(sorted(candidate_tuple_set, key=lambda t:t[0], reverse=True))
-        if Pattern.Substitute_Size and len(candidate_tuple_list) > Pattern.Substitute_Size:
-            candidate_tuple_list = candidate_tuple_list[:Pattern.Substitute_Size]
-        tools.show_log(f'candidate_tuple_list of {lemma}-{word_pos} = {candidate_tuple_list}')
-        
-        candidate_list = list(map(lambda t:t[1], candidate_tuple_list))
-        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size}｜candidate_list of {lemma}-{word_pos} = {candidate_list}')
-        return candidate_list
+        # 2）词级相似性排序 + 优先级规则排序
+        syn_list_set = map(lambda t:[self.__word_similarity(lemma, t), t], syn_set)
+        candidate_lists = list(filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_list_set))
+        tools.show_log(f'candidate_lists = {candidate_lists}')
+        self.__plus_rule_score(candidate_lists, lemma)
+        tools.show_log(f'plus_rule_score, then candidate_lists = {candidate_lists}')
+        sorted_candidate_lists = list(sorted(candidate_lists, key=lambda t:t[0], reverse=True))
+
+        # 3）截短并输出同义词集
+        if Pattern.Substitute_Size and len(sorted_candidate_lists) > Pattern.Substitute_Size:
+            sorted_candidate_lists = sorted_candidate_lists[:Pattern.Substitute_Size]
+        tools.show_log(f'sorted_candidate_lists of {lemma}-{word_pos} = {sorted_candidate_lists}')
+        sorted_candidate_list = list(map(lambda t:t[1], sorted_candidate_lists))
+        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size}｜sorted candidate_list of {lemma}-{word_pos} = {sorted_candidate_list}')
+        return sorted_candidate_list
     
-    def __word_similarity(self, word:str, word2:str):
+    def __word_similarity(self, word:str, word2:str) -> float:
         word_sim = self.__hownet_dict_advanced.calculate_word_similarity(word, word2)
         if word_sim <= -1:
             word_sim = (Pattern.Word_Similarity_Threshold + 0.01)
         return word_sim
     
+    # 通过添加规则分数区分相同相似性分数下的不同词
+    def __plus_rule_score(self, candidate_list_set: set, lema:str):
+        SUnit = 0.001
+        DUnit = 0.002
+        for candidate in candidate_list_set:
+            sim_score, syn_word = candidate[0], candidate[1]
+            s1 = set([c for c in syn_word])
+            s2 = set([c for c in lema])
+            tools.show_log(f'{sim_score} | {syn_word} = {s1}, {lema} = {s2}')
+            lema_size = len(s2)
+            isSizeSame = (len(s1) == lema_size)
+            if s1.isdisjoint(s2): # 两个词没有相同的字
+                if isSizeSame:
+                    candidate[0] = sim_score + SUnit
+            else: # 两个词有相同的字
+                intersect_len = len(s1.intersection(s2))
+                if isSizeSame:
+                    candidate[0] = sim_score + (intersect_len + lema_size) * DUnit
+                else:
+                    candidate[0] = sim_score + intersect_len * DUnit
+            tools.show_log(f'plus rule score = {candidate[0]}')
