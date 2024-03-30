@@ -13,6 +13,7 @@ class AdvText(BaseEntity):
         self.origin_label:int = origin_label
         self.origin_text:str = origin_text
         self.origin_probs:List[float] = origin_probs
+        self.incomplete_initial_probs:List[float] = None
 
         # 贪心选择的依据，决策分数值累计增大
         self.decision_score:float = 0
@@ -22,6 +23,8 @@ class AdvText(BaseEntity):
         self.token_units: List[TokenUnit] = None
         # token_units的元素数量
         self.token_count:int = None
+        # substitute语义词的数量
+        self.substitute_count:int = None
 
     
 

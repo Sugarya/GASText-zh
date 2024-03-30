@@ -81,3 +81,9 @@ class Validator:
         # 3 收集查询次数
         adversary_info.query_times = self.__victim_model.get_query_times()
         self.__victim_model.initial_query_time()
+
+
+    def generate_incomplete_initial_probs(self, adv_text: AdvText) -> List[float]:
+        incomplete_initial_text = tools.generate_incomplete_text(adv_text)
+        probs = self.__victim_model.output_probs(incomplete_initial_text)
+        return probs

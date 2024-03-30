@@ -13,7 +13,9 @@ class MaskedBeamSearch:
 
     def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
         units_size = len(substitute_units)
+        adv_text.substitute_count = units_size
         tools.show_log(f'WordMaskedGreedy search, the length of substitute_units = {units_size}')
+        
         travel_times = units_size
         travel_substitutes = list(substitute_units)
     
@@ -33,6 +35,12 @@ class MaskedBeamSearch:
             if len(substitute_unit.candicates) <= 2:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
                 continue
+
+
+
+
+
+
             
             # 3）遍历语义单元的候选词集，逐一替换和检验
             tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.decision_score}')
@@ -151,15 +159,20 @@ class MaskedBeamSearch:
        计算脆弱值，并降序排序
     '''
     def __sorted_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
-        # 1 计算脆弱值
-        # //TODO 验证：是否要取前 Top k个，是否要过滤掉负值
+        # 1 计算语义词缺失下的初始脆弱值
+        adv_text.incomplete_initial_probs = self.__validator.generate_incomplete_initial_probs(adv_text)
+        
+        # 2 计算每个语义词的脆弱值,/TODO 验证：是否要取前 Top k个，是否要过滤掉负值
         for index, substitute in enumerate(substitute_units):
             if substitute.state == SubstituteState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
         
-        # 2 sort按脆弱值大小降序  
+        # 1 sort按脆弱值大小降序
         sorted_substitute_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))
+        sorted_words = list(map(lambda t:f'{t.pos_in_text}-{t.origin_word}',sorted_substitute_list))
+        tools.show_log(f'sorted_substitute_list = {sorted_words}')
+        
         return sorted_substitute_list
 
     '''

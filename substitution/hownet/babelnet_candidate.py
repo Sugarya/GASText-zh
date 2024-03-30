@@ -58,7 +58,8 @@ class BabelNetBuilder:
         tools.show_log(f'all zh_synonyms = {syn_set}')
 
         # 2）词级相似性排序 + 优先级规则排序
-        syn_list_set = map(lambda t:[self.__word_similarity(lemma, t), t], syn_set)
+        syn_list_set = list(map(lambda t:[self.__word_similarity(lemma, t), t], syn_set))
+        tools.show_log(f'syn_list_set = {syn_list_set}')
         candidate_lists = list(filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_list_set))
         tools.show_log(f'candidate_lists = {candidate_lists}')
         self.__plus_rule_score(candidate_lists, lemma)
@@ -87,7 +88,7 @@ class BabelNetBuilder:
             sim_score, syn_word = candidate[0], candidate[1]
             s1 = set([c for c in syn_word])
             s2 = set([c for c in lema])
-            tools.show_log(f'{sim_score} | {syn_word} = {s1}, {lema} = {s2}')
+            # tools.show_log(f'{sim_score} | {syn_word} = {s1}, {lema} = {s2}')
             lema_size = len(s2)
             isSizeSame = (len(s1) == lema_size)
             if s1.isdisjoint(s2): # 两个词没有相同的字
@@ -99,4 +100,4 @@ class BabelNetBuilder:
                     candidate[0] = sim_score + (intersect_len + lema_size) * DUnit
                 else:
                     candidate[0] = sim_score + intersect_len * DUnit
-            tools.show_log(f'plus rule score = {candidate[0]}')
+            # tools.show_log(f'plus rule score = {candidate[0]}')
