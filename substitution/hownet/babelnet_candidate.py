@@ -23,10 +23,10 @@ class BabelNetBuilder:
         if Pattern.Ablation_Type != ArgAblation.Deletion:
             candidate_list.append('')
 
-        if Pattern.Substitute_Size and len(candidate_list) > Pattern.Substitute_Size:
-            candidate_list = candidate_list[:Pattern.Substitute_Size]
+        if Pattern.Substitute_Volume and len(candidate_list) > Pattern.Substitute_Volume:
+            candidate_list = candidate_list[:Pattern.Substitute_Volume]
 
-        tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}, Substitute_Size = {Pattern.Substitute_Size} ｜ candidate_list of {word}-{pos} = {candidate_list}')    
+        tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}, Substitute_Size = {Pattern.Substitute_Volume} ｜ candidate_list of {word}-{pos} = {candidate_list}')    
         return candidate_list
 
     '''
@@ -67,11 +67,11 @@ class BabelNetBuilder:
         sorted_candidate_lists = list(sorted(candidate_lists, key=lambda t:t[0], reverse=True))
 
         # 3）截短并输出同义词集
-        if Pattern.Substitute_Size and len(sorted_candidate_lists) > Pattern.Substitute_Size:
-            sorted_candidate_lists = sorted_candidate_lists[:Pattern.Substitute_Size]
+        if Pattern.Substitute_Volume and len(sorted_candidate_lists) > Pattern.Substitute_Volume:
+            sorted_candidate_lists = sorted_candidate_lists[:Pattern.Substitute_Volume]
         tools.show_log(f'sorted_candidate_lists of {lemma}-{word_pos} = {sorted_candidate_lists}')
         sorted_candidate_list = list(map(lambda t:t[1], sorted_candidate_lists))
-        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Size}｜sorted candidate_list of {lemma}-{word_pos} = {sorted_candidate_list}')
+        tools.show_log(f'Substitute_Size = {Pattern.Substitute_Volume}｜sorted candidate_list of {lemma}-{word_pos} = {sorted_candidate_list}')
         return sorted_candidate_list
     
     def __word_similarity(self, word:str, word2:str) -> float:

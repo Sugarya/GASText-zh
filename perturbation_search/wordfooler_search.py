@@ -54,7 +54,7 @@ class WordFoolerSearch:
                 return True
         
         self.__validator.collect_adversary_info(adv_text)
-        return False    
+        return False
 
 
    # TODO 提供样本粒度的条件约束

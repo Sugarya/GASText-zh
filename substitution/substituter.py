@@ -62,8 +62,8 @@ class Substituter:
             if not babel_candidate in sorted_masked_candidates:
                 sorted_masked_candidates.append(babel_candidate)
 
-        if Pattern.Substitute_Size and len(sorted_masked_candidates) > Pattern.Substitute_Size:
-            sorted_masked_candidates = sorted_masked_candidates[:Pattern.Substitute_Size]
+        if Pattern.Substitute_Volume and len(sorted_masked_candidates) > Pattern.Substitute_Volume:
+            sorted_masked_candidates = sorted_masked_candidates[:Pattern.Substitute_Volume]
 
         tools.show_log(f'hybrid_candidates = {sorted_masked_candidates}')
         return sorted_masked_candidates

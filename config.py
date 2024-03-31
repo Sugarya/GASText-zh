@@ -85,27 +85,32 @@ class ArgSubstituteSize:
 
 
 '''
-运行模式
+运行模式和元信息
 '''
 class Pattern:
     Algorithm:AlgoType = None
     IsTargetAttack = False
     Target_Label:int = None
-    Ablation_Type:int = None
 
-    Substitute_Size:int = None
+    Ablation_Type:int = None
+    Substitute_Volume:int = None
     Postfix:str = None
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
+    # CWordAttacker算法扰动比例上限
+    CWordAttacker_Perturbation_Threshold = 0.2
+    
     # 句子相似性
     Sentence_Similarity_Threshold = 0.95
     # 同义词和原始词的相似性上限
     Word_Similarity_Threshold  = 0.815
-
-    # CWordAttacker算法扰动比例上限
-    CWordAttacker_Perturbation_Threshold = 0.2
+    
+    # 束搜索的宽度
+    Beam_Width = 2
+    # 领域大小
+    Space_Column_Size = 3
     
 
 

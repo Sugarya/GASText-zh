@@ -1,7 +1,7 @@
 
 from .adversary_info import AdversaryInfo
 from .base_entity import BaseEntity
-from .token_unit import TokenUnit
+from .token_unit import TokenUnit, SubstituteUnit
 from typing import List
 
 '''
@@ -23,10 +23,9 @@ class AdvText(BaseEntity):
         self.token_units: List[TokenUnit] = None
         # token_units的元素数量
         self.token_count:int = None
-        # substitute语义词的数量
-        self.substitute_count:int = None
-
-    
-
-
+        
+        # MaskedBeamFooler方法内使用
+        self.substitute_count:int = None # 分词得到的语义词的数量
+        self.decision_queue = []
+        self.decision_substitute_list:List[SubstituteUnit] = []
  

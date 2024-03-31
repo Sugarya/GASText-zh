@@ -19,5 +19,5 @@ class Searcher:
             self.__greedy = MaskedBeamSearch(validator, substituter)
         
     
-    def perform(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
-        return self.__greedy.search(substitute_units, adv_text)
+    def perform(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
+        self.__greedy.search(substitute_units, adv_text)

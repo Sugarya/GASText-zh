@@ -11,7 +11,7 @@ class FragileMeasurer:
     def __init__(self, victim_model: HuggingFaceWrapper) -> None:
         self.__victim_model = victim_model
 
-          
+
     # DS策略
     def operate_ds_fragile(self, substitute:SubstituteUnit, adv_text: AdvText) -> float:
         substitute.state = SubstituteState.WORD_REPLACING

@@ -116,4 +116,4 @@ def setup_from_args(args):
         Pattern.Postfix = args.postfix
 
     if args.subsize:
-        Pattern.Substitute_Size = args.subsize
+        Pattern.Substitute_Volume = args.subsize

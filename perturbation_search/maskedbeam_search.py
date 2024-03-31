@@ -1,5 +1,7 @@
 from typing import List
-from common import SubstituteUnit, AdvText, tools, SubstituteState, AdversaryInfo
+import math
+from common.utils import tools
+from common.entity import SpaceInfo, AdvText, SubstituteUnit, AdversaryInfo, SubstituteState 
 from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
@@ -10,67 +12,93 @@ class MaskedBeamSearch:
         self.__validator = validator
         self.__substituter = substituter
 
-
-    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
+        self.Colunm_Size = Pattern.Space_Column_Size
+        self.Beam_Width = Pattern.Beam_Width
+        self.Substitute_Volume = Pattern.Substitute_Volume
+        
+    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
         units_size = len(substitute_units)
         adv_text.substitute_count = units_size
         tools.show_log(f'WordMaskedGreedy search, the length of substitute_units = {units_size}')
         
-        travel_times = units_size
-        travel_substitutes = list(substitute_units)
-    
-        # 1）计算脆弱值
-        travel_substitutes = self.__sorted_by_fragile_score(travel_substitutes, adv_text)
-        # 遍历语义单元序列
-        for index in range(travel_times):
+        # 1）计算脆弱值并降序排序
+        sorted_substitutes = self.__sorted_by_fragile_score(substitute_units, adv_text)
+
+        # 2）生成领域对象序列
+        space_info_list = self.__generate_spaceinfo_list(sorted_substitutes, adv_text)
+
+        # 3) 遍历领域对象，逐一计算领域内每个组合决策值，更新最佳组合信息
+        self.__travel_spaceinfos(space_info_list, adv_text)
+
+    '''
+       计算脆弱值，并降序排序
+    '''
+    def __sorted_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
+        # 1 计算语义词缺失下的初始脆弱值
+        adv_text.incomplete_initial_probs = self.__validator.generate_incomplete_initial_probs(adv_text)
+        
+        # 2 计算每个语义词的脆弱值,/TODO 验证：是否要取前 Top k个，是否要过滤掉负值
+        for index, substitute in enumerate(substitute_units):
+            if substitute.state == SubstituteState.WORD_REPLACED:
+                continue
+            self.__validator.operate_fragile(substitute, adv_text)
+        
+        # 1 sort按脆弱值大小降序
+        sorted_substitute_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))
+        sorted_words = list(map(lambda t:f'{t.pos_in_text}-{t.origin_word}',sorted_substitute_list))
+        tools.show_log(f'sorted_substitute_list = {sorted_words}')
+        
+        return sorted_substitute_list
+
+    def __generate_spaceinfo_list(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SpaceInfo]:
+        space_info_list = []
+
+        temp_substitute_container = []
+        substitute_units_size = len(substitute_units)
+        for index, substitute_unit in enumerate(substitute_units):
             tools.show_log(f'*****substitute- {index} -Round')
 
-            substitute_unit = travel_substitutes[index]
-            # 2）生成替代词
+            # 1）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
             substitute_unit.candicates = self.__substituter.generate_hybrid_candidates(substitute_unit, adv_text)
             
-            # 没有同义词集
-            if len(substitute_unit.candicates) <= 2:
+            # 2) 没有同义词集，跳过
+            isLast = (index == substitute_units_size - 1)
+            if len(substitute_unit.candicates) <= 1:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
+                if isLast: # 最后一个
+                    space_info_list.append(SpaceInfo(temp_substitute_container, self.Colunm_Size, self.Beam_Width))
                 continue
-
-
-
-
-
-
             
-            # 3）遍历语义单元的候选词集，逐一替换和检验
-            tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.decision_score}')
-            attack_succees = self.__operate_substitute(substitute_unit, adv_text)
-
-            # 4) 样本粒度约束条件检验
-            # disable = self.__disable_candidate_sample(adv_text)
-            # if disable:
-            #     self.__validator.collect_adversary_info(adv_text)
-            #     return False
-
-            # 5) 计算实验评价数据
-            if attack_succees:
-                self.__validator.collect_adversary_info(adv_text)
-                return True
+            # 3）添加领域
+            temp_substitute_container.append(substitute_unit)
+            if len(temp_substitute_container) == self.Colunm_Size or isLast:
+                space_info_list.append(SpaceInfo(temp_substitute_container, self.Colunm_Size, self.Beam_Width))
+                temp_substitute_container.clear()
         
-        self.__validator.collect_adversary_info(adv_text)
-        return False
-
-
-   # TODO 提供样本粒度的条件约束
-    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
-        return False
+        return space_info_list
+    
+    def __travel_spaceinfos(self, space_info_list: List[SpaceInfo], adv_text: AdvText):
+        
+        # 束搜索
+        for (decision_score, substitute_state_list) in adv_text.decision_queue:
+            # 1 更新语义词状态，为领域遍历时生成所需的最新文本
+            for (substitute, state) in zip(adv_text.decision_substitute_list, substitute_state_list):
+                substitute.state = state
+            # 2 遍历领域
+            for index, space_info in enumerate(space_info_list):
+                tools.show_log(f'*****space_info- {index} -Round')
+                space_capacity = math.pow(self.Substitute_Volume, self.Colunm_Size)
+                for i in range(space_capacity):
+                    pass
 
 
     '''
         处理单个语义单元，共有3个环节：初始化，逐一替换和检验，产生有效替代
         return: 当前substitute内，是否能找到对抗样本
     '''
-    def __operate_substitute(self, substitute: SubstituteUnit, adv_text:AdvText) -> bool:
+    def __operate_spaceinfo(self, substitute: SubstituteUnit, adv_text:AdvText) -> bool:
         
         # 环节1) SubstituteUnit初始化
         substitute.initial_decision_score = adv_text.decision_score
@@ -155,25 +183,9 @@ class MaskedBeamSearch:
         tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
         return False
 
-    '''
-       计算脆弱值，并降序排序
-    '''
-    def __sorted_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
-        # 1 计算语义词缺失下的初始脆弱值
-        adv_text.incomplete_initial_probs = self.__validator.generate_incomplete_initial_probs(adv_text)
-        
-        # 2 计算每个语义词的脆弱值,/TODO 验证：是否要取前 Top k个，是否要过滤掉负值
-        for index, substitute in enumerate(substitute_units):
-            if substitute.state == SubstituteState.WORD_REPLACED:
-                continue
-            self.__validator.operate_fragile(substitute, adv_text)
-        
-        # 1 sort按脆弱值大小降序
-        sorted_substitute_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))
-        sorted_words = list(map(lambda t:f'{t.pos_in_text}-{t.origin_word}',sorted_substitute_list))
-        tools.show_log(f'sorted_substitute_list = {sorted_words}')
-        
-        return sorted_substitute_list
+       # TODO 提供样本粒度的条件约束
+    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
+        return False
 
     '''
        计算脆弱值，并降序排序
