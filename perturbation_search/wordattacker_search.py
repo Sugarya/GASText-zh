@@ -1,5 +1,5 @@
 from typing import List
-from common import SubstituteUnit, AdvText, tools, SubstituteState, AdversaryInfo
+from common import SememicUnit, AdvText, tools, SememicState, AdversaryInfo
 from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
@@ -19,10 +19,10 @@ class WordAttackerGreedy:
         扰动搜索
         @return：True表示找到对抗样本，False表示没有找到
     '''
-    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> bool:
+    def search(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> bool:
         tools.show_log(f'WordAttackerGreedy search, the length of substitute_units = {len(substitute_units)}')
         # 1）计算脆弱值，并按脆弱值从大到小排序
-        travel_substitutes: List[SubstituteUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
+        travel_substitutes: List[SememicUnit] = self.__sort_by_fragile_score(substitute_units, adv_text)
 
         # 遍历语义单元序列，生成替代词--》替换--》检验
         for index, substitute_unit in enumerate(travel_substitutes):
@@ -60,7 +60,7 @@ class WordAttackerGreedy:
         处理单个语义单元，共有3个环节：初始化，逐一替换和检验，产生有效替代
         return: 当前substitute内，是否能找到对抗样本
     '''
-    def __operate_substitute(self, substitute:SubstituteUnit, adv_text:AdvText) -> bool:
+    def __operate_substitute(self, substitute:SememicUnit, adv_text:AdvText) -> bool:
         
         # 环节1) SubstituteUnit初始化
         substitute.initial_decision_score = adv_text.decision_score
@@ -72,7 +72,7 @@ class WordAttackerGreedy:
             
             # 2.1 替换动作
             substitute.exchange_word = candidate
-            substitute.state = SubstituteState.WORD_REPLACING
+            substitute.state = SememicState.WORD_REPLACING
 
             tools.show_log(f'************** {index} -round, candidate = {candidate}, substitute.state = {substitute.state}')
             
@@ -107,7 +107,7 @@ class WordAttackerGreedy:
             
             # 2.7 如果对抗样本成功
             if adversary_success:
-                substitute.state = SubstituteState.WORD_REPLACED
+                substitute.state = SememicState.WORD_REPLACED
                 adv_text.adversary_info.perturbated_token_count = adv_text.adversary_info.perturbated_token_count + 1
                 # 更新全局信息
                 adv_text.decision_score = cur_greedy_score
@@ -118,13 +118,13 @@ class WordAttackerGreedy:
         # 环节3）判断候选词是否有效，检验约束条件，更新状态
         # 3.1 是否有出现了有效候词替代原始文本
         if substitute.exchange_max_decision_score <= substitute.initial_decision_score:
-            substitute.state = SubstituteState.WORD_INITIAL
+            substitute.state = SememicState.WORD_INITIAL
             tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
             return False
 
         # 3.2 本轮产生了有效替代，更新全局greedy_score和substitute state
         adv_text.decision_score = substitute.exchange_max_decision_score
-        substitute.state = SubstituteState.WORD_REPLACED
+        substitute.state = SememicState.WORD_REPLACED
         adv_text.adversary_info.perturbated_token_count = adv_text.adversary_info.perturbated_token_count + 1
         tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
 
@@ -142,11 +142,11 @@ class WordAttackerGreedy:
     '''
        计算脆弱值，并降序排序
     '''
-    def __sort_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
+    def __sort_by_fragile_score(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SememicUnit]:
         # 1 计算脆弱值
         # //TODO 验证：是否要取前 Top k个，是否要过滤掉负值
         for index, substitute in enumerate(substitute_units):
-            if substitute.state == SubstituteState.WORD_REPLACED:
+            if substitute.state == SememicState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
         

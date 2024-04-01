@@ -1,6 +1,6 @@
 
 from typing import List
-from common import SubstituteUnit, AdvText, tools, SubstituteState, AdversaryInfo
+from common import SememicUnit, AdvText, tools, SememicState, AdversaryInfo
 from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
@@ -19,5 +19,5 @@ class Searcher:
             self.__greedy = MaskedBeamSearch(validator, substituter)
         
     
-    def perform(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
+    def perform(self, substitute_units: List[SememicUnit], adv_text: AdvText):
         self.__greedy.search(substitute_units, adv_text)

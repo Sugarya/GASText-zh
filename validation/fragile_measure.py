@@ -1,5 +1,5 @@
 import numpy as np
-from common.entity import AdvText, SubstituteUnit, SubstituteState
+from common.entity import AdvText, SememicUnit, SememicState
 from common.model import HuggingFaceWrapper
 from common.utils import tools
 from typing import List, Tuple
@@ -13,12 +13,12 @@ class FragileMeasurer:
 
 
     # DS策略
-    def operate_ds_fragile(self, substitute:SubstituteUnit, adv_text: AdvText) -> float:
-        substitute.state = SubstituteState.WORD_REPLACING
+    def operate_ds_fragile(self, substitute:SememicUnit, adv_text: AdvText) -> float:
+        substitute.state = SememicState.WORD_REPLACING
         substitute.exchange_word = ''
         updated_text = tools.generate_latest_text(adv_text)
         substitute.exchange_word = substitute.origin_word
-        substitute.state = SubstituteState.WORD_INITIAL
+        substitute.state = SememicState.WORD_INITIAL
         
         probs = self.__victim_model.output_probs(updated_text)
         substitute.fragile_score = self.__compute_ds_score(adv_text, probs)
@@ -36,12 +36,12 @@ class FragileMeasurer:
         return result_score
     
     # ADS策略: amplitude delete score
-    def operate_ads_fragile(self, substitute:SubstituteUnit, adv_text: AdvText):
-        substitute.state = SubstituteState.WORD_REPLACING
+    def operate_ads_fragile(self, substitute:SememicUnit, adv_text: AdvText):
+        substitute.state = SememicState.WORD_REPLACING
         substitute.exchange_word = ''
         updated_text = tools.generate_latest_text(adv_text)
         substitute.exchange_word = substitute.origin_word
-        substitute.state = SubstituteState.WORD_INITIAL
+        substitute.state = SememicState.WORD_INITIAL
 
         probs = self.__victim_model.output_probs(updated_text)
         substitute.fragile_score = self.__compute_ads_score(adv_text.origin_probs, probs)
@@ -59,12 +59,12 @@ class FragileMeasurer:
     
 
     # ADAS策略: amplitude delete and addtion score
-    def operate_adas_fragile(self, substitute:SubstituteUnit, adv_text: AdvText):
+    def operate_adas_fragile(self, substitute:SememicUnit, adv_text: AdvText):
         self.operate_ads_fragile(substitute, adv_text)
 
-        substitute.state = SubstituteState.WORD_REPLACING
+        substitute.state = SememicState.WORD_REPLACING
         incomplete_text = tools.generate_incomplete_text(adv_text)
-        substitute.state = SubstituteState.WORD_INITIAL
+        substitute.state = SememicState.WORD_INITIAL
         probs = self.__victim_model.output_probs(incomplete_text)
         ads_score = self.__compute_ads_score(adv_text.incomplete_initial_probs, probs)
         tools.show_log(f'adas part1 score = {substitute.fragile_score}, part2 score = {ads_score}')

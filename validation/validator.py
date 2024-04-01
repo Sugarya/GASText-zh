@@ -3,7 +3,7 @@ from typing import List, Tuple
 from config import Pattern, AlgoType, ArgAblation
 
 from common.model import HuggingFaceWrapper
-from common.entity import SubstituteUnit, SubstituteState, TokenStyle,AdvText
+from common.entity import SememicUnit, SememicState, TokenStyle, AdvText, DecisionInfo
 from common.utils import tools
 
 from .similarity_measure import SimMeasurer
@@ -49,7 +49,7 @@ class Validator:
     '''
         按不同的策略
     '''
-    def operate_fragile(self, substitute: SubstituteUnit, adv_text: AdvText):
+    def operate_fragile(self, substitute: SememicUnit, adv_text: AdvText):
         if Pattern.Algorithm == AlgoType.CWordAttacker:
             self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
         elif Pattern.Algorithm == AlgoType.SWordFooler:                
@@ -69,7 +69,7 @@ class Validator:
         # 1 收集替换词数量，perturbed_number
         adversary_info = adv_text.adversary_info
         adversary_info.perturbated_token_count = len(list(filter(lambda token_unit: 
-                token_unit.style == TokenStyle.WORD_SUBSTITUTE and token_unit.substitute_unit.state == SubstituteState.WORD_REPLACED
+                token_unit.style == TokenStyle.WORD_SUBSTITUTE and token_unit.substitute_unit.state == SememicState.WORD_REPLACED
                         ,adv_text.token_units)))
         
         # 2 收集替换词的总数
@@ -82,6 +82,27 @@ class Validator:
         adversary_info.query_times = self.__victim_model.get_query_times()
         self.__victim_model.initial_query_time()
 
+    # 为MaskedBeamFooler算法收集算法指标信息
+    def collect_adversary_info_for_maskedbeamfooler(self, decision_info: DecisionInfo, adv_text: AdvText):
+        adversary_info = adv_text.adversary_info
+        adversary_info.attack_success = True
+        adversary_info.adversary_accurary = decision_info.prob
+        adversary_info.adversary_text = decision_info.candidate_sample
+        adversary_info.adversary_label = decision_info.prob_label
+
+        adversary_info.text_token_count = adv_text.token_count
+        adversary_info.similarity = self.cosine_similarity(adversary_info.origin_text, decision_info.candidate_sample)
+        adversary_info.query_times = self.__victim_model.get_query_times()
+        self.__victim_model.initial_query_time()
+
+        count = 0
+        for score, dicision_info_list in  adv_text.decision_queue:
+            for dicision_info in dicision_info_list:
+                for column in dicision_info.columns:
+                    if column.state == SememicState.WORD_REPLACED:
+                        count = count + 1
+        adversary_info.perturbated_token_count = count
+        
 
     def generate_incomplete_initial_probs(self, adv_text: AdvText) -> List[float]:
         incomplete_initial_text = tools.generate_incomplete_text(adv_text)

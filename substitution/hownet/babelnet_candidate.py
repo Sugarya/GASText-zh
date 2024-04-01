@@ -49,7 +49,7 @@ class BabelNetBuilder:
 
     def synonyms_sortedby_sim_score(self, lemma:str, word_pos:str=None) -> List[str]:
         # 1）从babelnet中获得同义词集
-        syn_set = set()
+        syn_set = set([lemma])
         word_pos = tools.ltp_to_babelnet_pos(word_pos)
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)

@@ -1,10 +1,12 @@
-from typing import List
-import math
+from typing import List, Tuple
+import math, heapq
+import numpy as np
 from common.utils import tools
-from common.entity import SpaceInfo, AdvText, SubstituteUnit, AdversaryInfo, SubstituteState 
+from common.entity import SpaceUnit, AdvText, SememicUnit, AdversaryInfo, SememicState, DecisionInfo
 from validation import Validator
 from substitution import Substituter
 from config import Pattern, AlgoType
+
 
 class MaskedBeamSearch:
 
@@ -16,7 +18,7 @@ class MaskedBeamSearch:
         self.Beam_Width = Pattern.Beam_Width
         self.Substitute_Volume = Pattern.Substitute_Volume
         
-    def search(self, substitute_units: List[SubstituteUnit], adv_text: AdvText):
+    def search(self, substitute_units: List[SememicUnit], adv_text: AdvText):
         units_size = len(substitute_units)
         adv_text.substitute_count = units_size
         tools.show_log(f'WordMaskedGreedy search, the length of substitute_units = {units_size}')
@@ -33,13 +35,13 @@ class MaskedBeamSearch:
     '''
        计算脆弱值，并降序排序
     '''
-    def __sorted_by_fragile_score(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SubstituteUnit]:
+    def __sorted_by_fragile_score(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SememicUnit]:
         # 1 计算语义词缺失下的初始脆弱值
         adv_text.incomplete_initial_probs = self.__validator.generate_incomplete_initial_probs(adv_text)
         
         # 2 计算每个语义词的脆弱值,/TODO 验证：是否要取前 Top k个，是否要过滤掉负值
         for index, substitute in enumerate(substitute_units):
-            if substitute.state == SubstituteState.WORD_REPLACED:
+            if substitute.state == SememicState.WORD_REPLACED:
                 continue
             self.__validator.operate_fragile(substitute, adv_text)
         
@@ -50,7 +52,7 @@ class MaskedBeamSearch:
         
         return sorted_substitute_list
 
-    def __generate_spaceinfo_list(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> List[SpaceInfo]:
+    def __generate_spaceinfo_list(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SpaceUnit]:
         space_info_list = []
 
         temp_substitute_container = []
@@ -67,164 +69,193 @@ class MaskedBeamSearch:
             isLast = (index == substitute_units_size - 1)
             if len(substitute_unit.candicates) <= 1:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
-                if isLast: # 最后一个
-                    space_info_list.append(SpaceInfo(temp_substitute_container, self.Colunm_Size, self.Beam_Width))
+                container_len = len(temp_substitute_container)
+                if isLast and container_len > 0: # 最后一个，把剩余的装入
+                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
                 continue
             
             # 3）添加领域
             temp_substitute_container.append(substitute_unit)
-            if len(temp_substitute_container) == self.Colunm_Size or isLast:
-                space_info_list.append(SpaceInfo(temp_substitute_container, self.Colunm_Size, self.Beam_Width))
+            container_len = len(temp_substitute_container)
+            if container_len == self.Colunm_Size:
+                space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
                 temp_substitute_container.clear()
-        
+            else:
+                if isLast: # 最后一个则把剩余的装入
+                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
+
+
+        tools.show_log(f'space_info_list = {space_info_list}')
         return space_info_list
     
-    def __travel_spaceinfos(self, space_info_list: List[SpaceInfo], adv_text: AdvText):
-        
-        # 束搜索
-        for (decision_score, substitute_state_list) in adv_text.decision_queue:
-            # 1 更新语义词状态，为领域遍历时生成所需的最新文本
-            for (substitute, state) in zip(adv_text.decision_substitute_list, substitute_state_list):
-                substitute.state = state
-            # 2 遍历领域
-            for index, space_info in enumerate(space_info_list):
-                tools.show_log(f'*****space_info- {index} -Round')
-                space_capacity = math.pow(self.Substitute_Volume, self.Colunm_Size)
-                for i in range(space_capacity):
-                    pass
+    def __travel_spaceinfos(self, space_unit_list: List[SpaceUnit], adv_text: AdvText):
+        for index, space_unit in enumerate(space_unit_list):
+            tools.show_log(f'*****space_info - {index} - Round')
 
+            if len(adv_text.decision_queue[0][1]) > 0:
+                tools.show_log(f'*****decision_queue tuple | {len(adv_text.decision_queue[0][1])} > 0')
+                space_unit.initial_decision_queue = adv_text.decision_queue
 
-    '''
-        处理单个语义单元，共有3个环节：初始化，逐一替换和检验，产生有效替代
-        return: 当前substitute内，是否能找到对抗样本
-    '''
-    def __operate_spaceinfo(self, substitute: SubstituteUnit, adv_text:AdvText) -> bool:
-        
-        # 环节1) SubstituteUnit初始化
-        substitute.initial_decision_score = adv_text.decision_score
-        substitute.exchange_max_decision_score = adv_text.decision_score
-        substitute.exchange_max_decision_label = adv_text.origin_label
-        substitute.exchange_max_decision_word = substitute.origin_word
-
-        # 环节2）逐一遍历候选词集，尝试找到最佳替换词
-        for index, candidate in enumerate(substitute.candicates):
-            
-            # 2.1 替换并生成替换后的候选文本
-            substitute.exchange_word = candidate
-            substitute.state = SubstituteState.WORD_REPLACING
-            tools.show_log(f'************** {index} -round, candidate = {candidate}, substitute.state = {substitute.state}')
-            latest_candidate_text = tools.generate_latest_text(adv_text)
-
-            # 2.2 检验，输入到攻击模型；计算决策分数
-            candidate_probs, prob_label = self.__validator.model_output(latest_candidate_text)
-            cur_decision_score = self.__get_decision_score(candidate_probs, adv_text)
-            tools.show_log(f'**************candidate={candidate}, label(origin->prob): {adv_text.origin_label}->{prob_label}, cur_greedy_score = {cur_decision_score}')
-            
-            # 2.3 判断当前候选词是否是最佳的
-            if cur_decision_score <= substitute.initial_decision_score:
-                tools.show_log(f'************** continue --> cur_decision_score{cur_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
+            if not space_unit.initial_decision_queue:
+                self.__operate_space_unit(space_unit, adv_text)
                 continue
-            if cur_decision_score <= substitute.exchange_max_decision_score:
-                tools.show_log(f'************** continue --> cur_decision_score{cur_decision_score} <= {substitute.exchange_max_decision_score}exchange_max_greedy_score')
+
+            tools.show_log(f'*****loop in initial_decision_queue')
+            for (decision_score, initial_decision_info_list) in space_unit.initial_decision_queue:
+                # 初始化，更新语义词状态，为领域遍历时生成所需的最新文本
+                for initial_decision_info in initial_decision_info_list:
+                    for (sememe, initial_state, word) in zip(initial_decision_info.columns, initial_decision_info.decision_states, initial_decision_info.decision_words):
+                        sememe.state = initial_state
+                        if initial_state == SememicState.WORD_REPLACED:
+                            sememe.exchange_max_decision_word = word
+                        elif initial_state == SememicState.WORD_REPLACING:
+                            sememe.exchange_word = word
+                self.__operate_space_unit(space_unit, adv_text, initial_decision_info_list)
+
+
+
+    def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText, initial_decision_list:List[DecisionInfo] = None) -> bool:
+        cur_column_size = len(space_unit.columns)
+        space_capacity = int(math.pow(self.Substitute_Volume, cur_column_size))
+        # 1 遍历领域，逐一计算组合决策值
+        for num in range(space_capacity):
+            cur_indexs = list(np.base_repr(num, base=self.Substitute_Volume))
+            tools.show_log(f'*****{num} in space_capacity = {space_capacity}, cur space column_size = {cur_column_size}')
+            
+            diff_len = cur_column_size - len(cur_indexs)
+            if diff_len >= 1:
+                for i in range(diff_len):
+                    cur_indexs.append(0)
+            cur_indexs = list(map(lambda t:int(t), cur_indexs)) 
+            tools.show_log(f'*****complete cur_indexs = {cur_indexs}')
+            
+            # 替换词集存在长度不满情况，忽略这部分组合
+            disable = False
+            for index, (cur_index, sememic_unit) in enumerate(zip(cur_indexs, space_unit.columns)):
+                if cur_index >= len(sememic_unit.candicates):
+                    disable = True
+                    break
+            if disable:
+                tools.show_log(f'*****continue | disable cur_indexs = {cur_indexs}')
                 continue
-            # sim_score = self.__validator.cosine_similarity(adv_text.origin_text, latest_candidate_text)
-            # if sim_score < Pattern.Sentence_Similarity_Threshold:
-            #     tools.show_log(f'************** sim_score{sim_score} < {Pattern.Sentence_Similarity_Threshold}')
-            #     continue
+
+            # 更新当前组合下的词状态，词信息
+            tools.show_log(f'sememic_unit.candicates list = {[sememic_unit.candicates for sememic_unit in space_unit.columns]}')
+            decision_words = [None] * cur_column_size
+            for index, (cur_index, sememic_unit) in enumerate(zip(cur_indexs, space_unit.columns)):
+                decision_words[index] = sememic_unit.candicates[cur_index]
+                if cur_index == 0:
+                    sememic_unit.state = SememicState.WORD_INITIAL
+                else:
+                    sememic_unit.state = SememicState.WORD_REPLACING
+                    sememic_unit.exchange_word = sememic_unit.candicates[cur_index]    
+            tools.show_log(f'*****decision_words = {decision_words}')
+
+            # 获得该领域下当前组合的文本
+            lastest_text = tools.generate_latest_text(adv_text)
+            tools.show_log(f'*****lastest_text = {lastest_text}')
+            probs, prob_label = self.__validator.model_output(lastest_text)
+            decision_score = self.__get_decision_score(probs, adv_text)
+            tools.show_log(f'*****decision_score = {decision_score}')
             
-            # 2.4 找到最佳替换词，更新语义词信息
-            substitute.exchange_max_decision_score = cur_decision_score
-            substitute.exchange_max_decision_word = candidate
-            substitute.exchange_max_decision_label = prob_label
-            substitute.exchange_max_decision_prob = candidate_probs[adv_text.origin_label]
-            substitute.exchange_max_decision_text = latest_candidate_text
-        
-            tools.show_log(f'**************exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_label = {substitute.exchange_max_decision_label}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
-            tools.show_log(f'**************exchange_max_greedy_text = {substitute.exchange_max_decision_text}')
+            # 判断当前组合是否是领域最佳的，优先级队列按默认生序来
+            if space_unit.initial_decision_queue:
+                if decision_score <= space_unit.initial_decision_queue[0][0]:
+                    tools.show_log(f'*****continue | decision_score{decision_score } < {space_unit.initial_decision_queue[0][0]}initial_decision_queue_min_score')
+                    continue
+            if space_unit.exchange_max_decision_queue:
+                if decision_score <= space_unit.exchange_max_decision_queue[0][0]:
+                    tools.show_log(f'*****continue | decision_score{decision_score} < {space_unit.exchange_max_decision_queue[0][0]}exchange_max_decision_queue_min_score')
+                    continue
+
+            # 得到最佳组合，更新当前为最佳组合
+            decision_info = DecisionInfo()
+            decision_info.columns = space_unit.columns
+            decision_info.combination_indexs = cur_indexs
+            decision_info.decision_words = decision_words
+            decision_info.decision_states = [column.state for column in space_unit.columns]
+
+            decision_info.candidate_sample = lastest_text
+            decision_info.prob_label = prob_label
+            decision_info.prob = probs[prob_label]
+            tools.show_log(f'-------come up a current best combination：decision_info decision_states = {decision_info.decision_states}')
+
+            heapq.heapreplace(space_unit.exchange_max_decision_queue, (decision_score, decision_info))
             
-            # 2.5 如果成功，不再搜索
+            tools.show_log(f'*****prob_label={decision_info.prob_label} -- {adv_text.origin_label}adv_text.origin_label')
+            # 是否对抗成功，成功break
             if prob_label != adv_text.origin_label:
                 break
 
-        # 环节3）判断累计决策得到的最佳候选词是否有效
-        # 3.1 决策累计搜索是否更新了替换词
-        if substitute.exchange_max_decision_score <= substitute.initial_decision_score:
-            substitute.state = SubstituteState.WORD_INITIAL
-            tools.show_log(f'**************return substitute.state = {substitute.state}, exchange_max_greedy_score{substitute.exchange_max_decision_score} <= {substitute.initial_decision_score}initial_greedy_score')
+        # 2.1 判断当前最佳组合是否有效，即是否存在大于全局决策值
+        if space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0] <= adv_text.decision_queue[0][0]:
+            # 无效的最佳组合更新到全局
+            tools.show_log(f'*****continue | exchange_max_decision score{space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0]} <= {adv_text.decision_queue[0][0]}adv_text.decision_queue score')
+            self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
             return False
-        
-        # # 3.2 TODO 是否满足语义词级别的相似性标准
-        # sim_score = self.__validator.cosine_similarity(adv_text.origin_text, substitute.exchange_max_decision_text)
-        # tools.show_log(f'**************__operate_substitute sim_score = {sim_score}')
-        # if sim_score < Pattern.Sentence_Similarity_Threshold:
-        #     substitute.state = SubstituteState.WORD_INITIAL
-        #     tools.show_log(f'**************return sim_score = {sim_score} < {Pattern.Sentence_Similarity_Threshold}')
-        #     return False
-        
-        # 环节4）本轮产生了的最佳且有效的替换词
-        # 4.1 更新全局信息
-        substitute.state = SubstituteState.WORD_REPLACED
-        adv_text.decision_score = substitute.exchange_max_decision_score
-        
-        # 4.2 收集评价指标信息
-        adv_text.adversary_info.perturbated_token_count = adv_text.adversary_info.perturbated_token_count + 1
-        adv_text.adversary_info.adversary_accurary = substitute.exchange_max_decision_prob
-        adv_text.adversary_info.adversary_text = substitute.exchange_max_decision_text
-        adv_text.adversary_info.adversary_label = substitute.exchange_max_decision_label
-        
-        # 4.3 判断当前候选文本是否对抗成功
-        cur_adversary_success = (substitute.exchange_max_decision_label != adv_text.origin_label)
-        if cur_adversary_success:
-            # 收集评价指标信息
-            adv_text.adversary_info.attack_success = True
-            tools.show_log(f'**************ATTACK SUCCESS**************')
-            return True
+        # 2.2 判断是否满足约束
+        if self.__disable_candidate_sample(adv_text):
+            tools.show_log(f'*****continue | disable_candidate_sample')
+            self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
+            return False
 
-        tools.show_log(f'**************return substitute.state = {substitute.state} | exchange_max_greedy_word = {substitute.exchange_max_decision_word}, exchange_max_greedy_score = {substitute.exchange_max_decision_score}')
+        # 3 存在有效的最佳组合，把其更新到全局
+        tools.show_log(f'------exsit an effective and best combiantation, update to global...')
+        self.__update_to_global(SememicState.WORD_REPLACED, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
+
+        # 4 判断是否对抗成功
+        for (desicion_score, decision_info) in reversed(space_unit.exchange_max_decision_queue):
+            if decision_info.prob_label != adv_text.origin_label:
+                # 5 计算评价指标数据
+                self.__validator.collect_adversary_info_for_maskedbeamfooler(decision_info, adv_text)
+                tools.show_log(f'**************ATTACK SUCCESS**************')
+                return True
+
         return False
-
-       # TODO 提供样本粒度的条件约束
-    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
-        return False
-
-    '''
-       计算脆弱值，并降序排序
-    '''
-    def __pick_max_fragile_substitute(self, substitute_units: List[SubstituteUnit], adv_text: AdvText) -> SubstituteUnit:
-        # 1 计算脆弱值
-        # //TODO 验证：是否要取前 Top k个，是否要过滤掉负值
-        for index, substitute in enumerate(substitute_units):
-            if substitute.state == SubstituteState.WORD_REPLACED:
-                continue
-            self.__validator.operate_fragile(substitute, adv_text)
-            tools.show_log(f'compute fragile score-{index}, fragile_score = {substitute.fragile_score}')
-        
-        # 2 sort按脆弱值大小降序  
-        sorted_substitute_list = list(sorted(substitute_units, key = lambda t : t.fragile_score, reverse = True))
-        
-        # 3 返回最大的
-        max_substitute = sorted_substitute_list.pop(0)
-        return max_substitute
     
+
+    def __update_to_global(self, type:SememicState, 
+                           exchange_max_decision_queue:List[Tuple[int, DecisionInfo]], 
+                           decision_queue:List[Tuple[int, List[DecisionInfo]]],
+                           initial_decision_infos:List[DecisionInfo]):
+        # 语义词状态更新, 加入历史决策
+        for (score, decision_info) in reversed(exchange_max_decision_queue):
+            if score > decision_queue[0][0]:
+                if type == SememicState.WORD_INITIAL:
+                    decision_info.decision_states = [SememicState.WORD_INITIAL, SememicState.WORD_INITIAL, SememicState.WORD_INITIAL]
+                elif type == SememicState.WORD_REPLACED:
+                    for index, combination_index in enumerate(decision_info.combination_indexs):
+                        if combination_index == 0:
+                            decision_info.decision_states[index] = SememicState.WORD_INITIAL
+                        else:
+                            decision_info.decision_states[index] = SememicState.WORD_REPLACED 
+                
+                if initial_decision_infos != None:
+                    initial_decision_infos.append(decision_info)
+                    heapq.heapreplace(decision_queue, (score, initial_decision_infos))
+                else:
+                    heapq.heapreplace(decision_queue, (score, [decision_info]))
+
+
     '''
-        计算贪心选择的决策值
+        计算决策值
     '''
     def __get_decision_score(self, candidate_probs:List[float], adv_text:AdvText) -> float:
         decision_score = 0
         origin_probs = adv_text.origin_probs
-        
-        if Pattern.Algorithm == AlgoType.CWordAttacker:
-            if Pattern.IsTargetAttack:
-                target_label = Pattern.Target_Label
-                decision_score = candidate_probs[target_label] - origin_probs[target_label]
-            else:
-                origin_label = adv_text.origin_label
-                decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
+        target_label = Pattern.Target_Label
+        origin_label = adv_text.origin_label
+
+        if Pattern.IsTargetAttack:
+            decision_score = (candidate_probs[target_label] - origin_probs[target_label]) + (origin_probs[origin_label] - candidate_probs[origin_label])
         else:
-            target_label = Pattern.Target_Label
-            origin_label = adv_text.origin_label
-            if Pattern.IsTargetAttack:
-                decision_score = (candidate_probs[target_label] - origin_probs[target_label]) + (origin_probs[origin_label] - candidate_probs[origin_label])
-            else:
-                decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
+            decision_score = origin_probs[origin_label] - candidate_probs[origin_label]
+        
         return decision_score
+    
+    
+    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
+        return False
+
+    
+    

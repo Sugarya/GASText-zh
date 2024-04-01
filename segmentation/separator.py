@@ -3,7 +3,7 @@ import torch
 from ltp import LTP
 import jieba
 import jieba.posseg as pseg
-from common import tools, AdvText, TokenUnit, TokenStyle, SubstituteUnit
+from common import tools, AdvText, TokenUnit, TokenStyle, SememicUnit
 from typing import List
 from config import SeparatorType
 
@@ -29,7 +29,7 @@ class Separator:
             self.__ltp.to("cuda")
     
 
-    def split(self, adv_text: AdvText) -> List[SubstituteUnit]:
+    def split(self, adv_text: AdvText) -> List[SememicUnit]:
         if self.__type == SeparatorType.LTP:
             tools.show_log(f'self.__type={self.__type}, split_by_ltp')
             return self.__split_by_ltp(adv_text)
@@ -45,8 +45,8 @@ class Separator:
         pos=['r', 'v', 'nh', 'v', 'v', 'n', 'wp'], 
         ner=[('Nh', '汤姆')]
     '''
-    def __split_by_ltp(self, adv_text: AdvText) -> List[SubstituteUnit]:
-        substitute_units: List[SubstituteUnit] = []
+    def __split_by_ltp(self, adv_text: AdvText) -> List[SememicUnit]:
+        substitute_units: List[SememicUnit] = []
         output = self.__ltp.pipeline(adv_text.origin_text, tasks=["cws", "pos", "ner"])
         adv_text.token_count = len(output.cws)
         adv_text.token_units = [TokenUnit] * adv_text.token_count
@@ -65,8 +65,8 @@ class Separator:
     '''
        分词，babelnet支持的POS
     '''
-    def __split_by_ltp_for_babelnet(self, adv_text: AdvText) -> List[SubstituteUnit]:
-        substitute_units: List[SubstituteUnit] = []
+    def __split_by_ltp_for_babelnet(self, adv_text: AdvText) -> List[SememicUnit]:
+        substitute_units: List[SememicUnit] = []
         output = self.__ltp.pipeline(adv_text.origin_text, tasks=["cws", "pos", "ner"])
         adv_text.token_count = len(output.cws)
         adv_text.token_units = [TokenUnit] * adv_text.token_count
@@ -84,8 +84,8 @@ class Separator:
 
 
     # 对文本分词，生成替代单元列表
-    def __split_by_jieba(self, adv_text: AdvText) -> List[SubstituteUnit]:
-        substitute_units: List[SubstituteUnit] = []
+    def __split_by_jieba(self, adv_text: AdvText) -> List[SememicUnit]:
+        substitute_units: List[SememicUnit] = []
         adv_text.token_units = []
         # 精确分词
         seg_list = pseg.cut(adv_text.origin_text) #jieba 默认精确模式        

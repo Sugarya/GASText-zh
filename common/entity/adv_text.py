@@ -1,8 +1,10 @@
 
 from .adversary_info import AdversaryInfo
 from .base_entity import BaseEntity
-from .token_unit import TokenUnit, SubstituteUnit
-from typing import List
+from .token_unit import TokenUnit, SememicUnit
+from .space_unit import DecisionInfo
+from typing import List, Tuple
+from config import Pattern
 
 '''
     文本对象
@@ -26,6 +28,5 @@ class AdvText(BaseEntity):
         
         # MaskedBeamFooler方法内使用
         self.substitute_count:int = None # 分词得到的语义词的数量
-        self.decision_queue = []
-        self.decision_substitute_list:List[SubstituteUnit] = []
+        self.decision_queue:List[Tuple[int, List[DecisionInfo]]]  = [(0, [])] * Pattern.Beam_Width
  

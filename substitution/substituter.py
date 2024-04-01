@@ -3,7 +3,7 @@ import OpenHowNet
 from .hownet import BabelNetBuilder
 from .masked_fill import MaskedCandidateBuilder
 from .transformer import CWordAttackerTransformer
-from common import tools, SubstituteUnit, AdvText
+from common import tools, SememicUnit, AdvText
 from config import AlgoType, Pattern
 
 '''
@@ -24,7 +24,7 @@ class Substituter:
             self.__babelnet_builder = BabelNetBuilder(hownet_dict_advanced)
             self.__masked_builder = MaskedCandidateBuilder(hownet_dict_advanced)
 
-    def __generate(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def __generate(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
         result = []
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         tools.show_log(f'Substituter origin word = {origin_word}, pos = {origin_pos}')
@@ -44,7 +44,7 @@ class Substituter:
     def generate_hownet_synonyms(self, word:str, pos:str) -> List[str]:
         return self.__babelnet_builder.synonyms(word, pos)
 
-    def generate_masked_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def generate_masked_candidates(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
         candidate_list = self.__masked_builder.candidates(substitute_unit, adv_text)
         return candidate_list
 
@@ -53,7 +53,7 @@ class Substituter:
         1)masked候选集最高优 2)剩余按相似分数排序 
         3）相似分数相同的，按同义词带有原始词的字且和原始词相同字数的优先 > 同义词带有原始词的字 > 和原始词相同字数
     """
-    def generate_hybrid_candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def generate_hybrid_candidates(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
         sorted_masked_candidates = self.__masked_builder.candidates_sortedby_sim_score(substitute_unit, adv_text)
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         sorted_babel_candidates = self.__babelnet_builder.synonyms_sortedby_sim_score(origin_word, origin_pos)

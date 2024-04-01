@@ -4,7 +4,7 @@ from typing import List
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from arguement import parse_args
-from common import tools, SubstituteUnit, HuggingFaceWrapper
+from common import tools, SememicUnit, HuggingFaceWrapper
 from config import DEVICES, Pattern, ArgStyle, SeparatorType
 from dataset import DataLoader
 from segmentation import Separator
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     for index, adv_text in enumerate(adv_text_list):
         tools.show_log(f'adv_text: {index} Round')
         # 分词
-        substitute_units: List[SubstituteUnit] = separator.split(adv_text)
+        substitute_units: List[SememicUnit] = separator.split(adv_text)
         # 扰动查找
         searcher.perform(substitute_units, adv_text)
         # 收集评价指标信息

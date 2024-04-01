@@ -1,7 +1,7 @@
 
 from transformers import AutoTokenizer, AutoModelForMaskedLM, pipeline
 from config import Pattern
-from common import tools, SubstituteUnit, AdvText, BertMaskedModelWrapper, SubstituteState
+from common import tools, SememicUnit, AdvText, BertMaskedModelWrapper, SememicState
 from typing import List
 from OpenHowNet import HowNetDict
 
@@ -12,12 +12,12 @@ class MaskedCandidateBuilder:
         self.__hownet_dict_advanced = hownet_dict_advanced
         
 
-    def candidates(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def candidates(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
         substitute_unit.exchange_word = BertMaskedModelWrapper.MASK_TOKEN
-        substitute_unit.state = SubstituteState.WORD_REPLACING
+        substitute_unit.state = SememicState.WORD_REPLACING
         masked_text = tools.generate_text(adv_text)
         substitute_unit.exchange_word = substitute_unit.origin_word
-        substitute_unit.state = SubstituteState.WORD_INITIAL
+        substitute_unit.state = SememicState.WORD_INITIAL
         
         candidate_list = []
         candidate_list.extend(self.__bert_masked_moder.output(masked_text))
@@ -25,12 +25,12 @@ class MaskedCandidateBuilder:
         return candidate_list
     
 
-    def candidates_sortedby_sim_score(self, substitute_unit: SubstituteUnit, adv_text: AdvText) -> List[str]:
+    def candidates_sortedby_sim_score(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
         substitute_unit.exchange_word = BertMaskedModelWrapper.MASK_TOKEN
-        substitute_unit.state = SubstituteState.WORD_REPLACING
+        substitute_unit.state = SememicState.WORD_REPLACING
         masked_text = tools.generate_text(adv_text)
         substitute_unit.exchange_word = substitute_unit.origin_word
-        substitute_unit.state = SubstituteState.WORD_INITIAL
+        substitute_unit.state = SememicState.WORD_INITIAL
         masked_list = self.__bert_masked_moder.output(masked_text)
         tools.show_log(f'masked_list = {masked_list}')
 

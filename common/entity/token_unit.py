@@ -11,7 +11,7 @@ class TokenStyle(Enum):
     # 文本中，用来替代的
     WORD_SUBSTITUTE = 2
 
-class SubstituteState(Enum):
+class SememicState(Enum):
     WORD_INITIAL = 1
 
     # 文本中已经被替代的
@@ -28,7 +28,7 @@ class TokenUnit(BaseEntity):
 
     def __init__(self, pos_in_text:int, origin_token:str, origin_pos:str, style:TokenStyle):
         self.__common_init(pos_in_text, origin_token, origin_pos, style)
-        self.substitute_unit: SubstituteUnit = SubstituteUnit(pos_in_text, origin_token, origin_pos)
+        self.substitute_unit: SememicUnit = SememicUnit(pos_in_text, origin_token, origin_pos)
 
     def initial(self, pos_in_text:int, origin_token:str, origin_pos:str, style:TokenStyle):
         self.__common_init(pos_in_text, origin_token, origin_pos, style)
@@ -48,17 +48,17 @@ class TokenUnit(BaseEntity):
 '''
     语义单元实体类
 '''
-class SubstituteUnit((BaseEntity)):
+class SememicUnit((BaseEntity)):
 
     def __init__(self, pos_in_text: int, origin_word: str, origin_pos:str) -> None:
         self.__common_init(pos_in_text, origin_word, origin_pos)
-        self.state:SubstituteState = SubstituteState.WORD_INITIAL
+        self.state:SememicState = SememicState.WORD_INITIAL
         # 同义候选词集
         self.candicates:List[str] = []
 
     def initial(self, pos_in_text: int, origin_word: str, origin_pos:str):
         self.__common_init(pos_in_text, origin_word, origin_pos)
-        self.state:SubstituteState = None
+        self.state:SememicState = None
         self.candicates.clear()
 
     def __common_init(self, pos_in_text: int, origin_word: str, origin_pos:str):

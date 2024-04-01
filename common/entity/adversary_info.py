@@ -23,12 +23,12 @@ class AdversaryInfo(BaseEntity):
         self.adversary_accurary:float = origin_accurary
 
         # 文本中token的总数
-        self.text_token_count:int = None
+        self.text_token_count:int = 0
         # 对抗攻击成功后，文本里被扰动的词语的数量
         self.perturbated_token_count:int = 0
 
         # 和原始文本的相似度，范围：0～1
-        self.similarity:float = None
+        self.similarity:float = 0
         # 查询模型的次数
         self.query_times:float = 0
     

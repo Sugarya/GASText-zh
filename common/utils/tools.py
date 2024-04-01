@@ -1,6 +1,6 @@
 
 from config import Pattern, ArgStyle, ArgAlgorithm, AlgoType
-from common import AdvText, TokenStyle, SubstituteState
+from common import AdvText, TokenStyle, SememicState
 from typing import List, Tuple, Union
 
 
@@ -27,9 +27,9 @@ def generate_latest_text(adv_text: AdvText) -> str:
     display_list = [None] * adv_text.token_count
     for index, token_unit in enumerate(adv_text.token_units):                
         if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
-            if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
+            if token_unit.substitute_unit.state == SememicState.WORD_REPLACING:
                 display_list[index] = token_unit.substitute_unit.exchange_word
-            elif token_unit.substitute_unit.state == SubstituteState.WORD_REPLACED:
+            elif token_unit.substitute_unit.state == SememicState.WORD_REPLACED:
                 display_list[index] = token_unit.substitute_unit.exchange_max_decision_word
             else:
                 display_list[index] = token_unit.origin_token 
@@ -39,13 +39,13 @@ def generate_latest_text(adv_text: AdvText) -> str:
     return text
 
 '''
-    对WORD_REPLACING状态词元替换，比如Masked场景
+    对WORD_REPLACING状态词元替换，用于MLM生成替换词集
 '''
 def generate_text(adv_text: AdvText) -> str:
     display_list = [None] * len(adv_text.token_units)
     for index, token_unit in enumerate(adv_text.token_units):                
         if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
-            if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
+            if token_unit.substitute_unit.state == SememicState.WORD_REPLACING:
                 display_list[index] = token_unit.substitute_unit.exchange_word
             else:
                 display_list[index] = token_unit.origin_token
@@ -55,13 +55,13 @@ def generate_text(adv_text: AdvText) -> str:
     return text
 
 """
-    状态为WORD_SUBSTITUTE的词元设置为空字符，得到文本。比如用于ADAS策略计算脆弱值
+    状态为WORD_SUBSTITUTE的词元设置为空字符，得到文本。用于ADAS策略计算脆弱值
 """
 def generate_incomplete_text(adv_text: AdvText) -> str:
     display_list = [None] * len(adv_text.token_units)
     for index, token_unit in enumerate(adv_text.token_units):                
         if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
-            if token_unit.substitute_unit.state == SubstituteState.WORD_REPLACING:
+            if token_unit.substitute_unit.state == SememicState.WORD_REPLACING:
                 display_list[index] = token_unit.origin_token
             else:
                 display_list[index] = ''
