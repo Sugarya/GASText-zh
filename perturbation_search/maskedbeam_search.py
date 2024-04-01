@@ -203,14 +203,19 @@ class MaskedBeamSearch:
         tools.show_log(f'------exsit an effective and best combiantation, update to global...')
         self.__update_to_global(SememicState.WORD_REPLACED, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
 
+        # 5 计算评价指标数据-part1
+        self.__validator.collect_MBF_common_adversary(decision_info, adv_text)
+
         # 4 判断是否对抗成功
         for (desicion_score, decision_info) in reversed(space_unit.exchange_max_decision_queue):
             if decision_info.prob_label != adv_text.origin_label:
-                # 5 计算评价指标数据
-                self.__validator.collect_adversary_info_for_maskedbeamfooler(decision_info, adv_text)
+                # 计算评价指标数据-part2
+                self.__validator.collect_MBF_adversary_when_attack_success(decision_info, adv_text)
                 tools.show_log(f'**************ATTACK SUCCESS**************')
                 return True
-
+        
+        # 计算评价指标数据-part3
+        self.__validator.collect_MBF_adversary_when_attack_failure(decision_info, adv_text)
         return False
     
 

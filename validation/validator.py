@@ -83,18 +83,16 @@ class Validator:
         self.__victim_model.initial_query_time()
 
     # 为MaskedBeamFooler算法收集算法指标信息
-    def collect_adversary_info_for_maskedbeamfooler(self, decision_info: DecisionInfo, adv_text: AdvText):
+    def collect_MBF_common_adversary(self, decision_info: DecisionInfo, adv_text: AdvText):
         adversary_info = adv_text.adversary_info
-        adversary_info.attack_success = True
         adversary_info.adversary_accurary = decision_info.prob
         adversary_info.adversary_text = decision_info.candidate_sample
         adversary_info.adversary_label = decision_info.prob_label
-
         adversary_info.text_token_count = adv_text.token_count
         adversary_info.similarity = self.cosine_similarity(adversary_info.origin_text, decision_info.candidate_sample)
         adversary_info.query_times = self.__victim_model.get_query_times()
         self.__victim_model.initial_query_time()
-
+        
         count = 0
         for score, dicision_info_list in  adv_text.decision_queue:
             for dicision_info in dicision_info_list:
@@ -102,7 +100,15 @@ class Validator:
                     if column.state == SememicState.WORD_REPLACED:
                         count = count + 1
         adversary_info.perturbated_token_count = count
-        
+
+    def collect_MBF_adversary_when_attack_failure(self, decision_info: DecisionInfo, adv_text: AdvText):
+        adversary_info = adv_text.adversary_info
+        adversary_info.attack_success = False
+
+    def collect_MBF_adversary_when_attack_success(self, decision_info: DecisionInfo, adv_text: AdvText):
+        adversary_info = adv_text.adversary_info
+        adversary_info.attack_success = True
+
 
     def generate_incomplete_initial_probs(self, adv_text: AdvText) -> List[float]:
         incomplete_initial_text = tools.generate_incomplete_text(adv_text)
