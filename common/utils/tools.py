@@ -107,13 +107,20 @@ def setup_from_args(args):
 
     if args.algo:
         Pattern.Algorithm = __to_algorithm_type(args.algo)
-        show_log(f'setup_from_args | {Pattern.Algorithm}')
+        show_log(f'setup_from_args | algo = {Pattern.Algorithm}')
 
     if args.ablation:
         Pattern.Ablation_Type = args.ablation
+        show_log(f'setup_from_args | ablation = {Pattern.Ablation_Type}')
 
     if args.postfix:
         Pattern.Postfix = args.postfix
+        show_log(f'setup_from_args | postfix = {Pattern.Postfix}')
 
     if args.subsize:
         Pattern.Substitute_Volume = args.subsize
+        show_log(f'setup_from_args | subsize = {Pattern.Substitute_Volume}')
+
+    if args.spacesize:
+        Pattern.Space_Column_Size = args.spacesize
+        show_log(f'setup_from_args | spacesize = {Pattern.Space_Column_Size}')

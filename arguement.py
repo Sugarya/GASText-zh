@@ -1,5 +1,5 @@
 import argparse
-from config import ArgStyle, ArgAlgorithm, ArgLabel, ArgAblation, ArgSubstituteSize, ArgPostfix
+from config import ArgStyle, ArgAlgorithm, ArgLabel, ArgAblation, ArgSubstituteSize, ArgPostfix, ArgSpaceSize
 
 
 ArgumentDict = {}
@@ -39,6 +39,12 @@ def parse_args():
                            default = ArgSubstituteSize.Default,
                            type = int,
                            help = "the size of substitute set")
+    
+    parser.add_argument(ArgSpaceSize.NAME,
+                           default = ArgSpaceSize.Default,
+                           type = int,
+                           help = "the size of space columns")
+
 
     args = parser.parse_args()
     for key in list(args.__dict__.keys()):

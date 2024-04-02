@@ -54,7 +54,13 @@ class BabelNetBuilder:
         if self.__hownet_dict_advanced.has(lemma, LANGUAGE.ZH):
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
             for index, synonyms in enumerate(synonyms_list):
-                syn_set.update(synonyms.zh_synonyms)
+                for zh_synonym in synonyms.zh_synonyms:
+                    if '\\u' in zh_synonym:
+                        continue
+                    if '+' in zh_synonym:
+                        zh_synonym = zh_synonym.replace('+','')
+                    syn_set.add(zh_synonym)
+
         tools.show_log(f'all zh_synonyms = {syn_set}')
 
         # 2）词级相似性排序 + 优先级规则排序
