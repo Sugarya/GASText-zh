@@ -24,7 +24,7 @@ def format_example(example, style) -> Tuple[int, str]:
     生成当前最新的文本
 '''
 def generate_latest_text(adv_text: AdvText) -> str:
-    display_list = [None] * adv_text.token_count
+    display_list = [''] * adv_text.token_count
     for index, token_unit in enumerate(adv_text.token_units):                
         if token_unit.style == TokenStyle.WORD_SUBSTITUTE:
             if token_unit.substitute_unit.state == SememicState.WORD_REPLACING:

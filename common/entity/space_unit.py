@@ -8,15 +8,14 @@ from .token_unit import SememicUnit, SememicState
 '''
 class SpaceUnit(BaseEntity):
 
-    def __init__(self, columns: List[SememicUnit], column_size, beam_width = 2) -> None:
+    def __init__(self, columns: List[SememicUnit], column_size) -> None:
         super().__init__()
 
         self.columns:List[SememicUnit] = [column for column in columns]
 
-        self.initial_decision_queue:List[Tuple[int, List[DecisionInfo]]] = None
-
         self.exchange_word_indexs:List[int] = [None] * column_size
-        self.exchange_max_decision_queue:List[Tuple[int, DecisionInfo]] = [(0, DecisionInfo())] * beam_width
+        self.exchange_max_decision_score = 0
+        self.exchange_max_decision_info = DecisionInfo()
 
 
 # 确定领域最佳决策后，得到的各种信息存放于此
@@ -25,10 +24,9 @@ class DecisionInfo(BaseEntity):
     def __init__(self) -> None:
         super().__init__()
         
-        self.columns:List[SememicUnit] = None
+        self.columns:List[SememicUnit] = []
         self.combination_indexs = None
         self.decision_words:List[str] = None
-        self.decision_states:List[SememicState] = None
 
         self.candidate_sample:str = None
         self.prob_label:int = None

@@ -80,7 +80,7 @@ class ArgPostfix:
 class ArgSubstituteSize:
     NAME = '--subsize'
 
-    Default = 4
+    Default = 6
     # Default = None
 
 
@@ -109,9 +109,7 @@ class Pattern:
     Word_Similarity_Threshold  = 0.815
     
     # 领域大小
-    Space_Column_Size = 4
-    # 束搜索的宽度
-    Beam_Width = 2
+    Space_Column_Size = 2
    
     
 

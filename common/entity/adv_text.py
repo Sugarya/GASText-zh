@@ -28,5 +28,3 @@ class AdvText(BaseEntity):
         
         # MaskedBeamFooler方法内使用
         self.substitute_count:int = None # 分词得到的语义词的数量
-        self.decision_queue:List[Tuple[int, List[DecisionInfo]]]  = [(0, [])] * Pattern.Beam_Width
- 

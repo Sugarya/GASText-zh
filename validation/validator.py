@@ -89,22 +89,15 @@ class Validator:
         adversary_info.adversary_text = decision_info.candidate_sample
         adversary_info.adversary_label = decision_info.prob_label
 
-        adversary_info.similarity = self.cosine_similarity(adversary_info.origin_text, decision_info.candidate_sample)
-
     def collect_MBF_adversary_when_ending(self,adv_text: AdvText):
         adversary_info = adv_text.adversary_info
-        
+        adversary_info.similarity = self.cosine_similarity(adversary_info.origin_text, adversary_info.adversary_text)
         adversary_info.text_token_count = adv_text.token_count
         adversary_info.query_times = self.__victim_model.get_query_times()
         self.__victim_model.initial_query_time()
-        
-        count = 0
-        for score, dicision_info_list in  adv_text.decision_queue:
-            for dicision_info in dicision_info_list:
-                for column in dicision_info.columns:
-                    if column.state == SememicState.WORD_REPLACED:
-                        count = count + 1
-        adversary_info.perturbated_token_count = count / len(adv_text.decision_queue)
+        adversary_info.perturbated_token_count = len(list(filter(lambda token_unit: 
+                token_unit.style == TokenStyle.WORD_SUBSTITUTE and token_unit.substitute_unit.state == SememicState.WORD_REPLACED
+                        ,adv_text.token_units)))
 
 
     def generate_incomplete_initial_probs(self, adv_text: AdvText) -> List[float]:

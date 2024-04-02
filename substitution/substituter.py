@@ -61,6 +61,10 @@ class Substituter:
         for babel_candidate in sorted_babel_candidates:
             if not babel_candidate in sorted_masked_candidates:
                 sorted_masked_candidates.append(babel_candidate)
+        
+        if origin_word in sorted_masked_candidates:
+            sorted_masked_candidates.remove(origin_word)
+        sorted_masked_candidates.insert(0, origin_word)
 
         if Pattern.Substitute_Volume and len(sorted_masked_candidates) > Pattern.Substitute_Volume:
             sorted_masked_candidates = sorted_masked_candidates[:Pattern.Substitute_Volume]

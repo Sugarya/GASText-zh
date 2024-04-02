@@ -15,7 +15,6 @@ class MaskedBeamSearch:
         self.__substituter = substituter
 
         self.Colunm_Size = Pattern.Space_Column_Size
-        self.Beam_Width = Pattern.Beam_Width
         self.Substitute_Volume = Pattern.Substitute_Volume
         
     def search(self, substitute_units: List[SememicUnit], adv_text: AdvText):
@@ -71,57 +70,38 @@ class MaskedBeamSearch:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
                 container_len = len(temp_substitute_container)
                 if isLast and container_len > 0: # 最后一个，把剩余的装入
-                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
+                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
                 continue
             
             # 3）添加领域
             temp_substitute_container.append(substitute_unit)
             container_len = len(temp_substitute_container)
             if container_len == self.Colunm_Size:
-                space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
+                space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
                 temp_substitute_container.clear()
             else:
-                if isLast: # 最后一个则把剩余的装入
-                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len, self.Beam_Width))
+                if isLast and container_len > 0: # 最后一个则把剩余的装入
+                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
 
 
-        tools.show_log(f'space_info_list = {space_info_list}')
+        # tools.show_log(f'space_info_list = {space_info_list}')
         return space_info_list
     
     def __travel_spaceinfos(self, space_unit_list: List[SpaceUnit], adv_text: AdvText) -> bool:
         for index, space_unit in enumerate(space_unit_list):
             tools.show_log(f'*****space_info - {index} - Round')
-
-            if len(adv_text.decision_queue[0][1]) > 0:
-                tools.show_log(f'*****decision_queue tuple | {len(adv_text.decision_queue[0][1])} > 0')
-                space_unit.initial_decision_queue = adv_text.decision_queue
-
-            if not space_unit.initial_decision_queue:
-                self.__operate_space_unit(space_unit, adv_text)
-                continue
-
-            tools.show_log(f'*****loop in initial_decision_queue')
-            for (decision_score, initial_decision_info_list) in space_unit.initial_decision_queue:
-                # 初始化，更新语义词状态，为领域遍历时生成所需的最新文本
-                for initial_decision_info in initial_decision_info_list:
-                    for (sememe, initial_state, word) in zip(initial_decision_info.columns, initial_decision_info.decision_states, initial_decision_info.decision_words):
-                        sememe.state = initial_state
-                        if initial_state == SememicState.WORD_REPLACED:
-                            sememe.exchange_max_decision_word = word
-                        elif initial_state == SememicState.WORD_REPLACING:
-                            sememe.exchange_word = word
-                attack_success = self.__operate_space_unit(space_unit, adv_text, initial_decision_info_list)
-                if attack_success:
-                    adv_text.adversary_info.attack_success = True
-                    self.__validator.collect_MBF_adversary_when_ending(adv_text)
-                    return True
+            attack_success = self.__operate_space_unit(space_unit, adv_text)
+            if attack_success:
+                adv_text.adversary_info.attack_success = True
+                self.__validator.collect_MBF_adversary_when_ending(adv_text)
+                return True
         
         # 计算评价指标数据
         self.__validator.collect_MBF_adversary_when_ending(adv_text)
         return False
 
 
-    def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText, initial_decision_list:List[DecisionInfo] = None) -> bool:
+    def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText) -> bool:
         cur_column_size = len(space_unit.columns)
         space_capacity = int(math.pow(self.Substitute_Volume, cur_column_size))
         # 1 遍历领域，逐一计算组合决策值
@@ -155,96 +135,81 @@ class MaskedBeamSearch:
                     sememic_unit.state = SememicState.WORD_INITIAL
                 else:
                     sememic_unit.state = SememicState.WORD_REPLACING
-                    sememic_unit.exchange_word = sememic_unit.candicates[cur_index]    
-            tools.show_log(f'*****decision_words = {decision_words}')
+                    sememic_unit.exchange_word = sememic_unit.candicates[cur_index]
 
             # 获得该领域下当前组合的文本
             lastest_text = tools.generate_latest_text(adv_text)
-            tools.show_log(f'*****lastest_text = {lastest_text}')
+            tools.show_log(f'*****decision_words = {decision_words}, lastest_text = {lastest_text}')
             probs, prob_label = self.__validator.model_output(lastest_text)
-            decision_score = self.__get_decision_score(probs, adv_text)
-            tools.show_log(f'*****decision_score = {decision_score}')
+            cur_decision_score = self.__get_decision_score(probs, adv_text)
+            tools.show_log(f'*****the decision score of lastest text = {cur_decision_score}')
             
-            # 判断当前组合是否是领域最佳的，优先级队列按默认生序来
-            if space_unit.initial_decision_queue:
-                if decision_score <= space_unit.initial_decision_queue[0][0]:
-                    tools.show_log(f'*****continue1 | decision_score{decision_score } < {space_unit.initial_decision_queue[0][0]}initial_decision_queue_min_score')
-                    continue
-            if space_unit.exchange_max_decision_queue:
-                if decision_score <= space_unit.exchange_max_decision_queue[0][0]:
-                    tools.show_log(f'*****continue1 | decision_score{decision_score} < {space_unit.exchange_max_decision_queue[0][0]}exchange_max_decision_queue_min_score')
-                    continue
+            # 判断当前组合是否是领域最佳的，优先级队列按默认升序来
+            if cur_decision_score <= adv_text.decision_score:
+                tools.show_log(f'*****CONTNUE1.1 | decision_score{cur_decision_score } < {adv_text.decision_score}adv_text.decision_score')
+                continue
+    
+            if cur_decision_score <= space_unit.exchange_max_decision_score:
+                tools.show_log(f'*****CONTINUE1.2 | decision_score{cur_decision_score} < {space_unit.exchange_max_decision_score}exchange_max_decision_score')
+                continue
 
             # 得到最佳组合，更新当前为最佳组合
+            space_unit.exchange_max_decision_score = cur_decision_score
             decision_info = DecisionInfo()
             decision_info.columns = space_unit.columns
             decision_info.combination_indexs = cur_indexs
             decision_info.decision_words = decision_words
-            decision_info.decision_states = [column.state for column in space_unit.columns]
-
             decision_info.candidate_sample = lastest_text
             decision_info.prob_label = prob_label
             decision_info.prob = probs[prob_label]
-            tools.show_log(f'-------COME UP a current best combination：decision_info decision_states = {decision_info.decision_states}')
-
-            heapq.heapreplace(space_unit.exchange_max_decision_queue, (decision_score, decision_info))
+            space_unit.exchange_max_decision_info = decision_info
+            tools.show_log(f'-------COME UP a current best combination：decision_words = {decision_info.decision_words}')
             
-            tools.show_log(f'*****prob_label={decision_info.prob_label} -- {adv_text.origin_label}adv_text.origin_label')
             # 是否对抗成功，成功break
-            tools.show_log(f'*****{num}--prob_label{prob_label}, origin_label = {adv_text.origin_label}')
+            tools.show_log(f'************{num}***********PROB_LABEL{prob_label}->{adv_text.origin_label}ORIGIN_LABEL**********')
             if prob_label != adv_text.origin_label:
                 tools.show_log(f'******{num}-************ATTACK SUCCESS****************- | prob_label{prob_label} != {adv_text.origin_label}origin_label')
                 break
 
-        # 2.1 判断当前最佳组合是否有效，即是否存在大于全局决策值
-        if space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0] <= adv_text.decision_queue[0][0]:
+        # 2.1 判断当前最佳组合是否有效，即是否存在大于全局决策值        
+        if space_unit.exchange_max_decision_score <= adv_text.decision_score:
             # 无效的最佳组合更新到全局
-            tools.show_log(f'*****continue2.1 | exchange_max_decision score{space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0]} <= {adv_text.decision_queue[0][0]}adv_text.decision_queue score')
-            self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
+            tools.show_log(f'*****CONTINUE2.1 | exchange_max_decision score{space_unit.exchange_max_decision_score} <= {adv_text.decision_score}adv_text.decision_score')
+            self.__setup_global_intial(space_unit.exchange_max_decision_info)
             return False
         # 2.2 判断是否满足约束
         if self.__disable_candidate_sample(adv_text):
-            tools.show_log(f'*****continue2.2 | disable_candidate_sample')
-            self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
+            tools.show_log(f'*****CONTINUE2.2 | disable_candidate_sample')
+            self.__setup_global_intial(space_unit.exchange_max_decision_info)
             return False
 
         # 3 存在有效的最佳组合，把其更新到全局
-        tools.show_log(f'------EXSIT an effective and best combiantation, update to global...')
-        self.__update_to_global(SememicState.WORD_REPLACED, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
-
-        # 5 计算评价指标数据-part1
+        tools.show_log(f'------EXIST an effective and best combiantation{space_unit.exchange_max_decision_info.combination_indexs}={space_unit.exchange_max_decision_info.decision_words}, update to global...')
+        self.__setup_global_replaced(space_unit.exchange_max_decision_score, space_unit.exchange_max_decision_info, adv_text)
+        
+        # 4 计算评价指标数据
         self.__validator.collect_MBF_common_adversary(decision_info, adv_text)
-
-        # 4 判断是否对抗成功
-        for (desicion_score, decision_info) in reversed(space_unit.exchange_max_decision_queue):
-            if decision_info.prob_label != adv_text.origin_label:
-                tools.show_log(f'**************************ATTACK SUCCESS*****************************')
-                return True
-
+        # 5 判断是否对抗成功
+        if space_unit.exchange_max_decision_info.prob_label != adv_text.origin_label:
+            tools.show_log(f'*************FOUND IT*****ATTACK SUCCESS*****************')
+            return True
+        
         return False
     
 
-    def __update_to_global(self, type:SememicState, 
-                           exchange_max_decision_queue:List[Tuple[int, DecisionInfo]], 
-                           decision_queue:List[Tuple[int, List[DecisionInfo]]],
-                           initial_decision_infos:List[DecisionInfo]):
-        # 语义词状态更新, 加入历史决策
-        for (score, decision_info) in reversed(exchange_max_decision_queue):
-            if score > decision_queue[0][0]:
-                if type == SememicState.WORD_INITIAL:
-                    decision_info.decision_states = [SememicState.WORD_INITIAL, SememicState.WORD_INITIAL, SememicState.WORD_INITIAL]
-                elif type == SememicState.WORD_REPLACED:
-                    for index, combination_index in enumerate(decision_info.combination_indexs):
-                        if combination_index == 0:
-                            decision_info.decision_states[index] = SememicState.WORD_INITIAL
-                        else:
-                            decision_info.decision_states[index] = SememicState.WORD_REPLACED 
-                
-                if initial_decision_infos != None:
-                    initial_decision_infos.append(decision_info)
-                    heapq.heapreplace(decision_queue, (score, initial_decision_infos))
-                else:
-                    heapq.heapreplace(decision_queue, (score, [decision_info]))
+    def __setup_global_intial(self, max_decision_info: DecisionInfo,):
+        for sememe in max_decision_info.columns:
+            sememe.state = SememicState.WORD_INITIAL
+
+    def __setup_global_replaced(self, max_score:int, max_decision_info: DecisionInfo, adv_text:AdvText):
+        adv_text.decision_score = max_score
+
+        for sememe, combination_index, decision_word in zip(max_decision_info.columns, max_decision_info.combination_indexs, max_decision_info.decision_words):
+            if combination_index == 0:
+                sememe.state = SememicState.WORD_INITIAL
+            else:
+                sememe.state = SememicState.WORD_REPLACED
+                sememe.exchange_max_decision_word = decision_word
 
 
     '''
@@ -263,8 +228,7 @@ class MaskedBeamSearch:
         
         return decision_score
     
-    
-    def __disable_candidate_sample(self,adv_text: AdvText) -> bool:         
+    def __disable_candidate_sample(self, adv_text: AdvText) -> bool:         
         return False
 
     
