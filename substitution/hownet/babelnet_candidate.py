@@ -57,6 +57,10 @@ class BabelNetBuilder:
                 for zh_synonym in synonyms.zh_synonyms:
                     if '\\u' in zh_synonym:
                         continue
+                    
+                    if tools.is_only_alphabets(zh_synonym):
+                        continue
+
                     if '+' in zh_synonym:
                         zh_synonym = zh_synonym.replace('+','')
                     syn_set.add(zh_synonym)

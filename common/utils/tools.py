@@ -1,4 +1,4 @@
-
+import re
 from config import Pattern, ArgStyle, ArgAlgorithm, AlgoType
 from common import AdvText, TokenStyle, SememicState
 from typing import List, Tuple, Union
@@ -86,7 +86,13 @@ def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
         return 'r'
     else:
         return None
-    
+
+def is_only_alphabets(input_str) -> bool:
+    pattern = r'^[a-zA-Z]+$'
+    if re.match(pattern, input_str):
+        return True
+    else:
+        return False
 
 
 def __to_algorithm_type(type:str) -> AlgoType:
