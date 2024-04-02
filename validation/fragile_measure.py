@@ -69,6 +69,8 @@ class FragileMeasurer:
         ads_score = self.__compute_ads_score(adv_text.incomplete_initial_probs, probs)
         tools.show_log(f'adas part1 score = {substitute.fragile_score}, part2 score = {ads_score}')
     
-        C2 = 1 / adv_text.substitute_count
-        C1 = 1 - C2
+        # C2 = 1 / adv_text.substitute_count
+        # C1 = 1 - C2
+        C2 = 0.5
+        C1 = 0.5
         substitute.fragile_score = C1*substitute.fragile_score + C2*ads_score

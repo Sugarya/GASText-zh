@@ -88,7 +88,7 @@ class MaskedBeamSearch:
         tools.show_log(f'space_info_list = {space_info_list}')
         return space_info_list
     
-    def __travel_spaceinfos(self, space_unit_list: List[SpaceUnit], adv_text: AdvText):
+    def __travel_spaceinfos(self, space_unit_list: List[SpaceUnit], adv_text: AdvText) -> bool:
         for index, space_unit in enumerate(space_unit_list):
             tools.show_log(f'*****space_info - {index} - Round')
 
@@ -110,8 +110,15 @@ class MaskedBeamSearch:
                             sememe.exchange_max_decision_word = word
                         elif initial_state == SememicState.WORD_REPLACING:
                             sememe.exchange_word = word
-                self.__operate_space_unit(space_unit, adv_text, initial_decision_info_list)
-
+                attack_success = self.__operate_space_unit(space_unit, adv_text, initial_decision_info_list)
+                if attack_success:
+                    adv_text.adversary_info.attack_success = True
+                    self.__validator.collect_MBF_adversary_when_ending(adv_text)
+                    return True
+        
+        # 计算评价指标数据
+        self.__validator.collect_MBF_adversary_when_ending(adv_text)
+        return False
 
 
     def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText, initial_decision_list:List[DecisionInfo] = None) -> bool:
@@ -161,11 +168,11 @@ class MaskedBeamSearch:
             # 判断当前组合是否是领域最佳的，优先级队列按默认生序来
             if space_unit.initial_decision_queue:
                 if decision_score <= space_unit.initial_decision_queue[0][0]:
-                    tools.show_log(f'*****continue | decision_score{decision_score } < {space_unit.initial_decision_queue[0][0]}initial_decision_queue_min_score')
+                    tools.show_log(f'*****continue1 | decision_score{decision_score } < {space_unit.initial_decision_queue[0][0]}initial_decision_queue_min_score')
                     continue
             if space_unit.exchange_max_decision_queue:
                 if decision_score <= space_unit.exchange_max_decision_queue[0][0]:
-                    tools.show_log(f'*****continue | decision_score{decision_score} < {space_unit.exchange_max_decision_queue[0][0]}exchange_max_decision_queue_min_score')
+                    tools.show_log(f'*****continue1 | decision_score{decision_score} < {space_unit.exchange_max_decision_queue[0][0]}exchange_max_decision_queue_min_score')
                     continue
 
             # 得到最佳组合，更新当前为最佳组合
@@ -178,29 +185,31 @@ class MaskedBeamSearch:
             decision_info.candidate_sample = lastest_text
             decision_info.prob_label = prob_label
             decision_info.prob = probs[prob_label]
-            tools.show_log(f'-------come up a current best combination：decision_info decision_states = {decision_info.decision_states}')
+            tools.show_log(f'-------COME UP a current best combination：decision_info decision_states = {decision_info.decision_states}')
 
             heapq.heapreplace(space_unit.exchange_max_decision_queue, (decision_score, decision_info))
             
             tools.show_log(f'*****prob_label={decision_info.prob_label} -- {adv_text.origin_label}adv_text.origin_label')
             # 是否对抗成功，成功break
+            tools.show_log(f'*****{num}--prob_label{prob_label}, origin_label = {adv_text.origin_label}')
             if prob_label != adv_text.origin_label:
+                tools.show_log(f'******{num}-************ATTACK SUCCESS****************- | prob_label{prob_label} != {adv_text.origin_label}origin_label')
                 break
 
         # 2.1 判断当前最佳组合是否有效，即是否存在大于全局决策值
         if space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0] <= adv_text.decision_queue[0][0]:
             # 无效的最佳组合更新到全局
-            tools.show_log(f'*****continue | exchange_max_decision score{space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0]} <= {adv_text.decision_queue[0][0]}adv_text.decision_queue score')
+            tools.show_log(f'*****continue2.1 | exchange_max_decision score{space_unit.exchange_max_decision_queue[(self.Beam_Width - 1)][0]} <= {adv_text.decision_queue[0][0]}adv_text.decision_queue score')
             self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
             return False
         # 2.2 判断是否满足约束
         if self.__disable_candidate_sample(adv_text):
-            tools.show_log(f'*****continue | disable_candidate_sample')
+            tools.show_log(f'*****continue2.2 | disable_candidate_sample')
             self.__update_to_global(SememicState.WORD_INITIAL, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
             return False
 
         # 3 存在有效的最佳组合，把其更新到全局
-        tools.show_log(f'------exsit an effective and best combiantation, update to global...')
+        tools.show_log(f'------EXSIT an effective and best combiantation, update to global...')
         self.__update_to_global(SememicState.WORD_REPLACED, space_unit.exchange_max_decision_queue, adv_text.decision_queue, initial_decision_list)
 
         # 5 计算评价指标数据-part1
@@ -209,13 +218,9 @@ class MaskedBeamSearch:
         # 4 判断是否对抗成功
         for (desicion_score, decision_info) in reversed(space_unit.exchange_max_decision_queue):
             if decision_info.prob_label != adv_text.origin_label:
-                # 计算评价指标数据-part2
-                self.__validator.collect_MBF_adversary_when_attack_success(decision_info, adv_text)
-                tools.show_log(f'**************ATTACK SUCCESS**************')
+                tools.show_log(f'**************************ATTACK SUCCESS*****************************')
                 return True
-        
-        # 计算评价指标数据-part3
-        self.__validator.collect_MBF_adversary_when_attack_failure(decision_info, adv_text)
+
         return False
     
 

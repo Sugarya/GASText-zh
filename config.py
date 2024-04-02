@@ -108,10 +108,11 @@ class Pattern:
     # 同义词和原始词的相似性上限
     Word_Similarity_Threshold  = 0.815
     
+    # 领域大小
+    Space_Column_Size = 4
     # 束搜索的宽度
     Beam_Width = 2
-    # 领域大小
-    Space_Column_Size = 3
+   
     
 
 
