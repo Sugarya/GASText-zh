@@ -149,13 +149,14 @@ class MaskedAreaSearch:
             probs, prob_label = self.__validator.model_output(lastest_text)
             cur_decision_score = self.__get_decision_score(probs, adv_text)
             tools.show_log(f'*****the decision score of lastest text = {cur_decision_score}')
-            
+            tools.show_log(f'************{num}***********PROB_LABEL{prob_label}->{adv_text.origin_label}ORIGIN_LABEL**********')
+
             # 判断当前组合是否是领域最佳的，优先级队列按默认升序来
-            if cur_decision_score <= adv_text.decision_score:
+            attack_success = prob_label != adv_text.origin_label
+            if not attack_success and cur_decision_score <= adv_text.decision_score:
                 tools.show_log(f'*****CONTNUE1.1 | decision_score{cur_decision_score } < {adv_text.decision_score}adv_text.decision_score')
                 continue
-    
-            if cur_decision_score <= space_unit.exchange_max_decision_score:
+            if not attack_success and cur_decision_score <= space_unit.exchange_max_decision_score:
                 tools.show_log(f'*****CONTINUE1.2 | decision_score{cur_decision_score} < {space_unit.exchange_max_decision_score}exchange_max_decision_score')
                 continue
 
@@ -172,8 +173,7 @@ class MaskedAreaSearch:
             tools.show_log(f'-------COME UP a current best combination：decision_words = {decision_info.decision_words}')
             
             # 是否对抗成功，成功break
-            tools.show_log(f'************{num}***********PROB_LABEL{prob_label}->{adv_text.origin_label}ORIGIN_LABEL**********')
-            if prob_label != adv_text.origin_label:
+            if attack_success:
                 tools.show_log(f'******{num}-************ATTACK SUCCESS****************- | prob_label{prob_label} != {adv_text.origin_label}origin_label')
                 break
 

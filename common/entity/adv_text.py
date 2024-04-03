@@ -18,7 +18,7 @@ class AdvText(BaseEntity):
         self.incomplete_initial_probs:List[float] = None
 
         # 贪心选择的依据，决策分数值累计增大
-        self.decision_score:float = 0
+        self.decision_score:float = -1
         # 实时计算中，存储评价指标相关的信息
         self.adversary_info:AdversaryInfo = AdversaryInfo(origin_text, origin_label, origin_probs[origin_label])
         # 原始文本的每个token单元构成的列表
