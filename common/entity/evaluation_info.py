@@ -1,4 +1,5 @@
 from .base_entity import BaseEntity 
+from config import Pattern
 
 '''
     评价指标的统计结果
@@ -28,6 +29,8 @@ class EvaluationInfo(BaseEntity):
         self.ave_sim_score:float = None
         # 查询模型的次数
         self.ave_query_times:int = None
+
+        self.memo:str = f'S{Pattern.Substitute_Volume}C{Pattern.Space_Column_Size}'
         
     def to_dict(self, obj):
         return {
@@ -42,5 +45,6 @@ class EvaluationInfo(BaseEntity):
             'ave_accurary_reduction':self.ave_accurary_reduction,
             'ave_perturbated_count':self.ave_perturbated_count,
             'ave_perturbated_rate':self.ave_perturbated_rate,
-            'ave_query_times':self.ave_query_times
+            'ave_query_times':self.ave_query_times,
+            'memo':self.memo
         }

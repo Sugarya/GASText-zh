@@ -30,11 +30,11 @@ class ArgStyle:
     DEBUG_BERT_Shopping = f'{DEBUG}-{BERT}-{Shopping}'
     DEBUG_RoBERTa_Chinanews = f'{DEBUG}-{RoBERTa}-{Chinanews}'
 
-    Default = DEBUG_RoBERTa_Chinanews
+    Default = DEBUG_BERT_Shopping
 
     Dataset_File_Name = {
         BERT_Shopping:'partly_online_shopping_cats',
-        RoBERTa_Chinanews:'partly_chinanews3',
+        RoBERTa_Chinanews:'partly_chinanews',
         DEBUG_BERT_Shopping:'debug_online_shopping_cats',
         DEBUG_RoBERTa_Chinanews:'debug_chinanews'
     }
@@ -80,8 +80,7 @@ class ArgPostfix:
 class ArgSubstituteSize:
     NAME = '--subsize'
 
-    Default = 12
-    # Default = None
+    Default = None
 
 class ArgSpaceSize:
     NAME = '--spacesize'
@@ -99,7 +98,7 @@ class Pattern:
     Target_Label:int = None
 
     Ablation_Type:int = None
-    Substitute_Volume:int = None
+    Substitute_Volume:int = 10
     Postfix:str = None
 
     IsDebug = True #是否调试
