@@ -100,20 +100,26 @@ class MaskedBeamSearch:
         self.__validator.collect_MBF_adversary_when_ending(adv_text)
         return False
 
+    # 20转为数字
+    def __mapping_to_num(self, s:str) -> int:
+        if s.isdigit():
+            return int(s)
+        else:
+            return ord(s.upper()) - 55
+
 
     def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText) -> bool:
         cur_column_size = len(space_unit.columns)
         space_capacity = int(math.pow(self.Substitute_Volume, cur_column_size))
         # 1 遍历领域，逐一计算组合决策值
         for num in range(space_capacity):
-            cur_indexs = list(np.base_repr(num, base=self.Substitute_Volume))
+            cur_indexs = list(map(self.__mapping_to_num, list(np.base_repr(num, base=self.Substitute_Volume))))
             tools.show_log(f'*****{num} in space_capacity = {space_capacity}, cur space column_size = {cur_column_size}')
             
             diff_len = cur_column_size - len(cur_indexs)
             if diff_len >= 1:
                 for i in range(diff_len):
                     cur_indexs.append(0)
-            cur_indexs = list(map(lambda t:int(t), cur_indexs)) 
             tools.show_log(f'*****complete cur_indexs = {cur_indexs}')
             
             # 替换词集存在长度不满情况，忽略这部分组合

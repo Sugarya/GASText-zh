@@ -80,7 +80,7 @@ class ArgPostfix:
 class ArgSubstituteSize:
     NAME = '--subsize'
 
-    Default = 10
+    Default = 12
     # Default = None
 
 class ArgSpaceSize:
