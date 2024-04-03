@@ -30,7 +30,7 @@ class ArgStyle:
     DEBUG_BERT_Shopping = f'{DEBUG}-{BERT}-{Shopping}'
     DEBUG_RoBERTa_Chinanews = f'{DEBUG}-{RoBERTa}-{Chinanews}'
 
-    Default = DEBUG_BERT_Shopping
+    Default = DEBUG_RoBERTa_Chinanews
 
     Dataset_File_Name = {
         BERT_Shopping:'partly_online_shopping_cats',
