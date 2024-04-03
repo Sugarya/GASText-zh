@@ -6,7 +6,7 @@ from substitution import Substituter
 from config import Pattern, AlgoType
 from .wordattacker_search import WordAttackerGreedy
 from .wordfooler_search import WordFoolerSearch
-from .maskedbeam_search import MaskedBeamSearch
+from .maskedarea_search import MaskedAreaSearch
 
 class Searcher:
 
@@ -16,7 +16,7 @@ class Searcher:
         elif Pattern.Algorithm == AlgoType.SWordFooler:
             self.__greedy = WordFoolerSearch(validator, substituter)
         else:
-            self.__greedy = MaskedBeamSearch(validator, substituter)
+            self.__greedy = MaskedAreaSearch(validator, substituter)
         
     
     def perform(self, substitute_units: List[SememicUnit], adv_text: AdvText):

@@ -14,7 +14,7 @@ class SeparatorType(Enum):
 class AlgoType(Enum):
     CWordAttacker = 1
     SWordFooler = 2
-    MaskedBeamFooler = 3
+    MaskedAreaFooler = 3
 
 class ArgStyle:
     NAME = '--style'
@@ -49,7 +49,7 @@ class ArgAlgorithm:
     NAME = '--algo'
     CWordAttacker = 'CWordAttacker'
     SWordFooler = 'SWordFooler'
-    MaskedBeamFooler = 'MaskedBeamFooler'
+    MaskedBeamFooler = 'MaskedAreaFooler'
 
     Default = MaskedBeamFooler
 
@@ -98,7 +98,7 @@ class Pattern:
     Target_Label:int = None
 
     Ablation_Type:int = None
-    Substitute_Volume:int = 10
+    Substitute_Volume:int = 14
     Postfix:str = None
 
     IsDebug = True #是否调试

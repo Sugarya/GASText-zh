@@ -32,7 +32,7 @@ class Substituter:
             result = self.generate_cwordattacker_candidate(origin_word)
         elif self.__type == AlgoType.SWordFooler:
             result = self.generate_hownet_synonyms(origin_word, origin_pos)
-        elif self.__type == AlgoType.MaskedBeamFooler:
+        elif self.__type == AlgoType.MaskedAreaFooler:
             result = self.generate_hybrid_candidates(substitute_unit, adv_text)
         return result
     

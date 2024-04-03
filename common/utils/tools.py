@@ -103,7 +103,7 @@ def __to_algorithm_type(type:str) -> AlgoType:
         return AlgoType.SWordFooler
     
     else:
-        return AlgoType.MaskedBeamFooler
+        return AlgoType.MaskedAreaFooler
 
 def setup_from_args(args):
     if args.style:
