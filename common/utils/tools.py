@@ -87,6 +87,7 @@ def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
     else:
         return None
 
+# 正则匹配英文大小字母
 def is_only_alphabets(input_str) -> bool:
     pattern = r'^[a-zA-Z]+$'
     if re.match(pattern, input_str):
@@ -94,6 +95,13 @@ def is_only_alphabets(input_str) -> bool:
     else:
         return False
 
+# 正则匹配中文标点符号
+def is_punctuation(input_str) -> bool:
+    pattern = r'[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]'
+    if re.match(pattern, input_str):
+        return True
+    else:
+        return False
 
 def __to_algorithm_type(type:str) -> AlgoType:
     if type == ArgAlgorithm.CWordAttacker:

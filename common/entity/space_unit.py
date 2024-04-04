@@ -14,7 +14,7 @@ class SpaceUnit(BaseEntity):
         self.columns:List[SememicUnit] = [column for column in columns]
 
         self.exchange_word_indexs:List[int] = [None] * column_size
-        self.exchange_max_decision_score = 0
+        self.exchange_max_decision_score = -1
         self.exchange_max_decision_info = DecisionInfo()
 
 
