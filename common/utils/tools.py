@@ -88,20 +88,29 @@ def ltp_to_babelnet_pos(ltp_pos:str) -> Union[str, None]:
         return None
 
 # 正则匹配英文大小字母
-def is_only_alphabets(input_str) -> bool:
-    pattern = r'^[a-zA-Z]+$'
+def is_invalid_characters(input_str:str) -> bool:
+    pattern = r'[a-zA-Z0-9]+\w+'
     if re.match(pattern, input_str):
         return True
     else:
         return False
 
-# 正则匹配中文标点符号
-def is_punctuation(input_str) -> bool:
-    pattern = r'[\u3002\uff1b\uff0c\uff1a\u201c\u201d\uff08\uff09\u3001\uff1f\u300a\u300b]'
+# 正则匹配特殊字符，即非字母、非数字、非汉字、非_
+def is_special_characters(input_str:str) -> bool:
+    pattern = r'[\W]+'
     if re.match(pattern, input_str):
         return True
     else:
         return False
+    
+# 正则匹配中文
+def is_chinese(input_str:str) -> bool:
+    pattern = r'[\u4e00-\u9fa5]+'
+    if re.match(pattern, input_str):
+        return True
+    else:
+        return False
+    
 
 def __to_algorithm_type(type:str) -> AlgoType:
     if type == ArgAlgorithm.CWordAttacker:

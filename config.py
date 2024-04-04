@@ -110,7 +110,7 @@ class Pattern:
     # 句子相似性
     Sentence_Similarity_Threshold = 0.95
     # 同义词和原始词的相似性上限
-    Word_Similarity_Threshold  = 0.65
+    Word_Similarity_Threshold  = 0.6
     
     # 领域大小
     Space_Column_Size = 1

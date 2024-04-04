@@ -55,15 +55,10 @@ class BabelNetBuilder:
             synonyms_list = self.__hownet_dict_advanced.get_synset(lemma, language = LANGUAGE.ZH, pos=word_pos)
             for index, synonyms in enumerate(synonyms_list):
                 for zh_synonym in synonyms.zh_synonyms:
-                    if '\\u' in zh_synonym:
-                        continue
-                    
-                    if tools.is_only_alphabets(zh_synonym):
-                        continue
-
                     if '+' in zh_synonym:
-                        zh_synonym = zh_synonym.replace('+','')
-                    syn_set.add(zh_synonym)
+                        zh_synonym = zh_synonym.replace('+','')    
+                    if tools.is_chinese(zh_synonym):
+                        syn_set.add(zh_synonym)
 
         tools.show_log(f'all zh_synonyms = {syn_set}')
 

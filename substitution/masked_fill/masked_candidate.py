@@ -46,9 +46,7 @@ class MaskedCandidateBuilder:
 
     def __filter(self, s:str) -> bool:
         input_str = s
-        no_punctuation = not tools.is_punctuation(input_str) 
-        no_alphabets = not tools.is_only_alphabets(input_str)
-        return no_punctuation and no_alphabets
+        return tools.is_chinese(input_str)
 
 
     def __word_similarity(self, word:str, word2:str):
