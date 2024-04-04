@@ -36,7 +36,7 @@ class MaskedCandidateBuilder:
 
         masked_list = filter(self.__filter, masked_list)
         masked_tuple_list = map(lambda t:(self.__word_similarity(substitute_unit.origin_word,t), t), masked_list)
-        filter_tuple_list = filter(lambda t:t[0] > Pattern.Word_Similarity_Threshold, masked_tuple_list)
+        filter_tuple_list = filter(lambda t:t[0] > Pattern.Masked_Similarity_Threshold, masked_tuple_list)
         sorted_tuple_list = list(sorted(filter_tuple_list, key=lambda t:t[0], reverse=True))
         tools.show_log(f'sorted_tuple_list = {sorted_tuple_list}')
         

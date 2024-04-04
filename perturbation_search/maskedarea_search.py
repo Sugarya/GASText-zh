@@ -14,8 +14,8 @@ class MaskedAreaSearch:
         self.__validator = validator
         self.__substituter = substituter
 
-        self.Colunm_Size = Pattern.Space_Column_Size
-        self.Substitute_Volume = Pattern.Substitute_Volume
+        self.Space_Width = Pattern.Space_Width
+        self.Space_Depth = Pattern.Space_Depth
         
     def search(self, substitute_units: List[SememicUnit], adv_text: AdvText):
         units_size = len(substitute_units)
@@ -53,9 +53,11 @@ class MaskedAreaSearch:
 
     def __generate_spaceinfo_list(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SpaceUnit]:
         space_info_list = []
-
+        sequence = [1]*len(substitute_units)
+        sequence[0] = self.Space_Width
+        sequence_index = 0
+        
         temp_substitute_container = []
-        substitute_units_size = len(substitute_units)
         for index, substitute_unit in enumerate(substitute_units):
             tools.show_log(f'*****substitute- {index} -Round')
 
@@ -66,24 +68,21 @@ class MaskedAreaSearch:
             substitute_unit.candicates = self.__substituter.generate_hybrid_candidates(substitute_unit, adv_text)
             
             # 2) 没有同义词集，跳过
-            isLast = (index == substitute_units_size - 1)
-            if len(substitute_unit.candicates) <= 1:
+            if not substitute_unit.candicates or len(substitute_unit.candicates) <= 1:
                 tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
-                container_len = len(temp_substitute_container)
-                if isLast and container_len > 0: # 最后一个，把剩余的装入
-                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
                 continue
             
             # 3）添加领域
             temp_substitute_container.append(substitute_unit)
             container_len = len(temp_substitute_container)
-            if container_len == self.Colunm_Size:
+            if container_len == sequence[sequence_index]:
                 space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
+                sequence_index = sequence_index + 1
                 temp_substitute_container.clear()
-            else:
-                if isLast and container_len > 0: # 最后一个则把剩余的装入
-                    space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
 
+        container_len = len(temp_substitute_container)
+        if container_len > 0: #把剩余的装入
+            space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
 
         # tools.show_log(f'space_info_list = {space_info_list}')
         return space_info_list
@@ -111,10 +110,10 @@ class MaskedAreaSearch:
 
     def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText) -> bool:
         cur_column_size = len(space_unit.columns)
-        space_capacity = int(math.pow(self.Substitute_Volume, cur_column_size))
+        space_capacity = int(math.pow(self.Space_Depth, cur_column_size))
         # 1 遍历领域，逐一计算组合决策值
         for num in range(space_capacity):
-            cur_indexs = list(map(self.__mapping_to_num, list(np.base_repr(num, base=self.Substitute_Volume))))
+            cur_indexs = list(map(self.__mapping_to_num, list(np.base_repr(num, base=self.Space_Depth))))
             tools.show_log(f'*****{num} in space_capacity = {space_capacity}, cur space column_size = {cur_column_size}')
             
             diff_len = cur_column_size - len(cur_indexs)

@@ -30,7 +30,7 @@ class EvaluationInfo(BaseEntity):
         # 查询模型的次数
         self.ave_query_times:int = None
 
-        self.memo:str = f'S{Pattern.Substitute_Volume}C{Pattern.Space_Column_Size}'
+        self.memo:str = f'S{Pattern.Substitute_Volume}C{Pattern.Space_Width}'
         
     def to_dict(self, obj):
         return {

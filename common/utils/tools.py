@@ -149,5 +149,5 @@ def setup_from_args(args):
         show_log(f'setup_from_args | subsize = {Pattern.Substitute_Volume}')
 
     if args.spacesize:
-        Pattern.Space_Column_Size = args.spacesize
-        show_log(f'setup_from_args | spacesize = {Pattern.Space_Column_Size}')
+        Pattern.Space_Width = args.spacesize
+        show_log(f'setup_from_args | spacesize = {Pattern.Space_Width}')

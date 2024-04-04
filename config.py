@@ -100,6 +100,10 @@ class Pattern:
     Ablation_Type:int = None
     Substitute_Volume:int = 35
     Postfix:str = None
+    # 领域宽度
+    Space_Width = 2
+    # 领域深度
+    Space_Depth = 35
 
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'
@@ -111,9 +115,9 @@ class Pattern:
     Sentence_Similarity_Threshold = 0.95
     # 同义词和原始词的相似性上限
     Word_Similarity_Threshold  = 0.6
-    
-    # 领域大小
-    Space_Column_Size = 1
+
+    Masked_Similarity_Threshold  = 0.2
+
    
     
 

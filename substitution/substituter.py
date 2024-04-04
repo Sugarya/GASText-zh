@@ -54,7 +54,7 @@ class Substituter:
         3）相似分数相同的，按同义词带有原始词的字且和原始词相同字数的优先 > 同义词带有原始词的字 > 和原始词相同字数
     """
     def generate_hybrid_candidates(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
-        sorted_masked_candidates = self.__masked_builder.candidates(substitute_unit, adv_text)
+        sorted_masked_candidates = self.__masked_builder.candidates_sortedby_sim_score(substitute_unit, adv_text)
         
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         sorted_babel_candidates = self.__babelnet_builder.synonyms_sortedby_sim_score(origin_word, origin_pos)

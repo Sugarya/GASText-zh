@@ -45,8 +45,6 @@ class BabelNetBuilder:
         return list(candidates)
     
 
-
-
     def synonyms_sortedby_sim_score(self, lemma:str, word_pos:str=None) -> List[str]:
         # 1）从babelnet中获得同义词集
         syn_set = set()
