@@ -30,7 +30,7 @@ class ArgStyle:
     DEBUG_BERT_Shopping = f'{DEBUG}-{BERT}-{Shopping}'
     DEBUG_RoBERTa_Chinanews = f'{DEBUG}-{RoBERTa}-{Chinanews}'
 
-    Default = DEBUG_RoBERTa_Chinanews
+    Default = DEBUG_BERT_Shopping
 
     Dataset_File_Name = {
         BERT_Shopping:'partly_online_shopping_cats',
@@ -98,7 +98,7 @@ class Pattern:
     Target_Label:int = None
 
     Ablation_Type:int = None
-    Substitute_Volume:int = 18
+    Substitute_Volume:int = 5
     Postfix:str = None
 
     IsDebug = True #是否调试

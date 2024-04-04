@@ -57,35 +57,36 @@ class Evaluator():
         perturbed_token_sum = 0
 
         sim_score_sum = 0
-        # success_similarity_score_sum = 0
         query_times_sum = 0
         
         for index, adversary_info in enumerate(self.__adversary_infos):
             if adversary_info.attack_success:
-                origin_accurary_sum += adversary_info.origin_accurary
-                adversary_accurary_sum += adversary_info.adversary_accurary
-                
                 attack_success_sum += 1
-                sim_score_sum += adversary_info.similarity
-                perturbed_token_sum += adversary_info.perturbated_token_count
-                text_token_sum += adversary_info.text_token_count
-                query_times_sum += adversary_info.query_times
+
+            origin_accurary_sum += adversary_info.origin_accurary
+            adversary_accurary_sum += adversary_info.adversary_accurary
+
+            sim_score_sum += adversary_info.similarity
+            perturbed_token_sum += adversary_info.perturbated_token_count
+            text_token_sum += adversary_info.text_token_count
+            query_times_sum += adversary_info.query_times
         
         self.__evaluation_result.attack_success_sum = attack_success_sum
-        if attack_success_sum != 0:
-            self.__evaluation_result.ave_origin_accurary = origin_accurary_sum / attack_success_sum
-            self.__evaluation_result.ave_adversary_accurary = adversary_accurary_sum / attack_success_sum
-            self.__evaluation_result.ave_accurary_reduction = (origin_accurary_sum - adversary_accurary_sum) / attack_success_sum
-
-            self.__evaluation_result.ave_sim_score = sim_score_sum / attack_success_sum
-            self.__evaluation_result.ave_perturbated_count = perturbed_token_sum / attack_success_sum
-            self.__evaluation_result.ave_query_times = query_times_sum / attack_success_sum
 
         validated_example_count = self.__evaluation_result.validated_example_count
         if validated_example_count != 0:
             self.__evaluation_result.attack_success_rate = attack_success_sum / validated_example_count
+            self.__evaluation_result.ave_origin_accurary = origin_accurary_sum / validated_example_count
+            self.__evaluation_result.ave_adversary_accurary = adversary_accurary_sum / validated_example_count
+            self.__evaluation_result.ave_accurary_reduction = (origin_accurary_sum - adversary_accurary_sum) / validated_example_count
+
+            self.__evaluation_result.ave_sim_score = sim_score_sum / validated_example_count
+            self.__evaluation_result.ave_perturbated_count = perturbed_token_sum / validated_example_count
+            self.__evaluation_result.ave_query_times = query_times_sum / validated_example_count
+        
         if text_token_sum != 0:
             self.__evaluation_result.ave_perturbated_rate = perturbed_token_sum / text_token_sum
+
 
         self.__evaluation_result.target_attack = Pattern.IsTargetAttack
         self.__evaluation_result.target_label = Pattern.Target_Label
