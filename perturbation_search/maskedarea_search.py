@@ -62,6 +62,7 @@ class MaskedAreaSearch:
             # 1）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
+            # substitute_unit.candicates = self.__substituter.generate_hownet_synonyms(origin_word, origin_pos)
             substitute_unit.candicates = self.__substituter.generate_hybrid_candidates(substitute_unit, adv_text)
             
             # 2) 没有同义词集，跳过

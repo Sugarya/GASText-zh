@@ -71,7 +71,7 @@ class BabelNetBuilder:
         syn_list_set = list(map(lambda t:[self.__word_similarity(lemma, t), t], syn_set))
         tools.show_log(f'syn_list_set = {syn_list_set}')
         candidate_lists = list(filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_list_set))
-        # tools.show_log(f'candidate_lists = {candidate_lists}')
+
         self.__plus_rule_score(candidate_lists, lemma)
         tools.show_log(f'plus_rule_score, then candidate_lists = {candidate_lists}')
         sorted_candidate_lists = list(sorted(candidate_lists, key=lambda t:t[0], reverse=True))

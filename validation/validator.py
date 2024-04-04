@@ -60,7 +60,7 @@ class Validator:
                 self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
                 tools.show_log(f'compute ADS fragile, fragile_score = {substitute.fragile_score}')
         else:
-            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+            self.__fragile_measurer.operate_adas_fragile(substitute, adv_text)
             tools.show_log(f'compute ADAS fragile, fragile_score = {substitute.fragile_score}')
 
 

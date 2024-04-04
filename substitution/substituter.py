@@ -54,16 +54,17 @@ class Substituter:
         3）相似分数相同的，按同义词带有原始词的字且和原始词相同字数的优先 > 同义词带有原始词的字 > 和原始词相同字数
     """
     def generate_hybrid_candidates(self, substitute_unit: SememicUnit, adv_text: AdvText) -> List[str]:
-        sorted_masked_candidates = self.__masked_builder.candidates_sortedby_sim_score(substitute_unit, adv_text)
+        sorted_masked_candidates = self.__masked_builder.candidates(substitute_unit, adv_text)
+        
         origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
         sorted_babel_candidates = self.__babelnet_builder.synonyms_sortedby_sim_score(origin_word, origin_pos)
 
-        for babel_candidate in sorted_babel_candidates:
-            if not babel_candidate in sorted_masked_candidates:
-                sorted_masked_candidates.append(babel_candidate)
+        for masked_candidate in sorted_masked_candidates:
+            if not masked_candidate in sorted_babel_candidates:
+                sorted_babel_candidates.append(masked_candidate)
 
-        if Pattern.Substitute_Volume and len(sorted_masked_candidates) > Pattern.Substitute_Volume:
-            sorted_masked_candidates = sorted_masked_candidates[:Pattern.Substitute_Volume]
+        if Pattern.Substitute_Volume and len(sorted_babel_candidates) > Pattern.Substitute_Volume:
+            sorted_babel_candidates = sorted_babel_candidates[:Pattern.Substitute_Volume]
 
-        tools.show_log(f'hybrid_candidates = {sorted_masked_candidates}')
-        return sorted_masked_candidates
+        tools.show_log(f'hybrid_candidates = {sorted_babel_candidates}')
+        return sorted_babel_candidates
