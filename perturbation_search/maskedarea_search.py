@@ -51,12 +51,17 @@ class MaskedAreaSearch:
         
         return sorted_substitute_list
 
+    def __generate_sequence(self, substitute_units: List[SememicUnit]) -> List[int]:
+        sequence = [2]
+        size = len(substitute_units)
+        if size >= 3:
+            sequence.extend([1 for s in range(size - 2)])
+        return sequence
+
     def __generate_spaceinfo_list(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SpaceUnit]:
         space_info_list = []
-        sequence = [1]*len(substitute_units)
-        sequence[0] = self.Space_Width
+        sequence = self.__generate_sequence(substitute_units)
         sequence_index = 0
-        
         temp_substitute_container = []
         for index, substitute_unit in enumerate(substitute_units):
             tools.show_log(f'*****substitute- {index} -Round')
