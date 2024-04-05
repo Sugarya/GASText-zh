@@ -52,6 +52,7 @@ class Validator:
     def operate_fragile(self, substitute: SememicUnit, adv_text: AdvText):
         if Pattern.Fragile_Type:
             if Pattern.Fragile_Type == ArgFragileType.DS:
+                tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
                 self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
             elif Pattern.Fragile_Type == ArgFragileType.ADS:
                 tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')

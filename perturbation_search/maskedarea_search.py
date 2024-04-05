@@ -56,17 +56,21 @@ class MaskedAreaSearch:
         size = len(substitute_units)
         if Pattern.Space_Style:
             if Pattern.Space_Style == ArgSpaceStyle.Single:
+                tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
                 sequence = [1 for s in range(size)]
             elif Pattern.Space_Style == ArgSpaceStyle.Capital:
+                tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
                 sequence = [Pattern.Space_Width]
                 if size >= 3:
                     sequence.extend([1 for s in range(size - 2)])
             elif Pattern.Space_Style == ArgSpaceStyle.Alternate:
+                tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
                 sequence = [1 for s in range(size)]
                 for i in range(size):
                     if i % 2 == 0:
                         sequence[i] = Pattern.Space_Width
             elif Pattern.Space_Style == ArgSpaceStyle.Full:
+                tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
                 sequence = [Pattern.Space_Width for s in range(math.ceil(size / 2))]  
             return sequence
         
