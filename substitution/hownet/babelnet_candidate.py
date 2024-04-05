@@ -63,7 +63,7 @@ class BabelNetBuilder:
         # 2）词级相似性排序 + 优先级规则排序
         syn_list_set = list(map(lambda t:[self.__word_similarity(lemma, t), t], syn_set))
         tools.show_log(f'syn_list_set = {syn_list_set}')
-        candidate_lists = list(filter(lambda t:t[0]>Pattern.Word_Similarity_Threshold, syn_list_set))
+        candidate_lists = list(filter(lambda t:t[0]>Pattern.Hownet_Similarity_Threshold, syn_list_set))
 
         self.__plus_rule_score(candidate_lists, lemma)
         tools.show_log(f'plus_rule_score, then candidate_lists = {candidate_lists}')
@@ -80,7 +80,7 @@ class BabelNetBuilder:
     def __word_similarity(self, word:str, word2:str) -> float:
         word_sim = self.__hownet_dict_advanced.calculate_word_similarity(word, word2)
         if word_sim <= -1:
-            word_sim = (Pattern.Word_Similarity_Threshold + 0.01)
+            word_sim = (Pattern.Hownet_Similarity_Threshold + 0.01)
         return word_sim
     
     # 通过添加规则分数区分相同相似性分数下的不同词

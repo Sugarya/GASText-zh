@@ -130,7 +130,6 @@ def setup_from_args(args):
         Pattern.Algorithm = __to_algorithm_type(args.algo)
         show_log(f'setup_from_args | algo = {Pattern.Algorithm}')  
 
-
     if args.label or args.label == 0:
         Pattern.IsTargetAttack = True
         Pattern.Target_Label = args.label
@@ -151,3 +150,23 @@ def setup_from_args(args):
     if args.spacesize:
         Pattern.Space_Width = args.spacesize
         show_log(f'setup_from_args | spacesize = {Pattern.Space_Width}')
+
+    if args.fragtype:
+        Pattern.Fragile_Type = args.fragtype
+        show_log(f'setup_from_args | fragtype = {Pattern.Fragile_Type}')
+    
+    if args.subtype:
+        Pattern.Substitute_Type = args.subtype
+        show_log(f'setup_from_args | subtype = {Pattern.Substitute_Type}')
+
+    if args.spacestyle:
+        Pattern.Space_Style = args.spacestyle
+        show_log(f'setup_from_args | spacestyle = {Pattern.Space_Style}')
+
+    if args.hsimthreshold:
+        Pattern.Hownet_Similarity_Threshold = args.hsimthreshold
+        show_log(f'setup_from_args | hsimthreshold = {Pattern.Hownet_Similarity_Threshold}')
+
+    if args.msimthreshold:
+        Pattern.Masked_Similarity_Threshold = args.msimthreshold
+        show_log(f'setup_from_args | msimthreshold = {Pattern.Masked_Similarity_Threshold}')

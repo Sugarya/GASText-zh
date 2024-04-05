@@ -5,7 +5,7 @@ from common.utils import tools
 from common.entity import SpaceUnit, AdvText, SememicUnit, AdversaryInfo, SememicState, DecisionInfo
 from validation import Validator
 from substitution import Substituter
-from config import Pattern, AlgoType
+from config import Pattern, ArgSpaceStyle
 
 
 class MaskedAreaSearch:
@@ -13,9 +13,6 @@ class MaskedAreaSearch:
     def __init__(self, validator: Validator, substituter: Substituter) -> None:
         self.__validator = validator
         self.__substituter = substituter
-
-        self.Space_Width = Pattern.Space_Width
-        self.Space_Depth = Pattern.Space_Depth
         
     def search(self, substitute_units: List[SememicUnit], adv_text: AdvText):
         units_size = len(substitute_units)
@@ -51,17 +48,39 @@ class MaskedAreaSearch:
         
         return sorted_substitute_list
 
+    '''
+        生成领域序列，确定领域宽度信息
+    '''
     def __generate_sequence(self, substitute_units: List[SememicUnit]) -> List[int]:
-        sequence = [2]
+        sequence = []
         size = len(substitute_units)
+        if Pattern.Space_Style:
+            if Pattern.Space_Style == ArgSpaceStyle.Single:
+                sequence = [1 for s in range(size)]
+            elif Pattern.Space_Style == ArgSpaceStyle.Capital:
+                sequence = [Pattern.Space_Width]
+                if size >= 3:
+                    sequence.extend([1 for s in range(size - 2)])
+            elif Pattern.Space_Style == ArgSpaceStyle.Alternate:
+                sequence = [1 for s in range(size)]
+                for i in range(size):
+                    if i % 2 == 0:
+                        sequence[i] = Pattern.Space_Width
+            elif Pattern.Space_Style == ArgSpaceStyle.Full:
+                sequence = [Pattern.Space_Width for s in range(math.ceil(size / 2))]  
+            return sequence
+        
+        sequence = [Pattern.Space_Width]
         if size >= 3:
-            sequence.extend([1 for s in range(size - 2)])
+            sequence.extend([1 for s in range(size - 2)])        
+
         return sequence
 
     def __generate_spaceinfo_list(self, substitute_units: List[SememicUnit], adv_text: AdvText) -> List[SpaceUnit]:
         space_info_list = []
         sequence = self.__generate_sequence(substitute_units)
         sequence_index = 0
+
         temp_substitute_container = []
         for index, substitute_unit in enumerate(substitute_units):
             tools.show_log(f'*****substitute- {index} -Round')
@@ -69,8 +88,7 @@ class MaskedAreaSearch:
             # 1）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
             tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
-            # substitute_unit.candicates = self.__substituter.generate_hownet_synonyms(origin_word, origin_pos)
-            substitute_unit.candicates = self.__substituter.generate_hybrid_candidates(substitute_unit, adv_text)
+            substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
             
             # 2) 没有同义词集，跳过
             if not substitute_unit.candicates or len(substitute_unit.candicates) <= 1:
@@ -81,13 +99,13 @@ class MaskedAreaSearch:
             temp_substitute_container.append(substitute_unit)
             container_len = len(temp_substitute_container)
             if container_len == sequence[sequence_index]:
-                space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
+                space_info_list.append(SpaceUnit(temp_substitute_container, container_len, Pattern.Space_Depth))
                 sequence_index = sequence_index + 1
                 temp_substitute_container.clear()
 
         container_len = len(temp_substitute_container)
         if container_len > 0: #把剩余的装入
-            space_info_list.append(SpaceUnit(temp_substitute_container, container_len))
+            space_info_list.append(SpaceUnit(temp_substitute_container, container_len, Pattern.Space_Depth))
 
         # tools.show_log(f'space_info_list = {space_info_list}')
         return space_info_list
@@ -105,7 +123,7 @@ class MaskedAreaSearch:
         self.__validator.collect_MBF_adversary_when_ending(adv_text)
         return False
 
-    # 20转为数字
+    # 转为数字
     def __mapping_to_num(self, s:str) -> int:
         if s.isdigit():
             return int(s)
@@ -115,10 +133,10 @@ class MaskedAreaSearch:
 
     def __operate_space_unit(self, space_unit: SpaceUnit, adv_text: AdvText) -> bool:
         cur_column_size = len(space_unit.columns)
-        space_capacity = int(math.pow(self.Space_Depth, cur_column_size))
+        space_capacity = int(math.pow(space_unit.depth, cur_column_size))
         # 1 遍历领域，逐一计算组合决策值
         for num in range(space_capacity):
-            cur_indexs = list(map(self.__mapping_to_num, list(np.base_repr(num, base=self.Space_Depth))))
+            cur_indexs = list(map(self.__mapping_to_num, list(np.base_repr(num, base=space_unit.depth))))
             tools.show_log(f'*****{num} in space_capacity = {space_capacity}, cur space column_size = {cur_column_size}')
             
             diff_len = cur_column_size - len(cur_indexs)
@@ -207,11 +225,16 @@ class MaskedAreaSearch:
         
         return False
     
-
+    '''
+        把领域状态设置为初始化
+    '''
     def __setup_global_intial(self, max_decision_info: DecisionInfo,):
         for sememe in max_decision_info.columns:
             sememe.state = SememicState.WORD_INITIAL
 
+    '''
+        把领域状态设置为已替换
+    '''
     def __setup_global_replaced(self, max_score:int, max_decision_info: DecisionInfo, adv_text:AdvText):
         adv_text.decision_score = max_score
 
@@ -241,6 +264,3 @@ class MaskedAreaSearch:
     
     def __disable_candidate_sample(self, adv_text: AdvText) -> bool:         
         return False
-
-    
-    

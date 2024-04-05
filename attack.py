@@ -34,7 +34,7 @@ if __name__ == '__main__':
     validator = Validator(victim_model)
 
     # 初始化替代器
-    substituter = Substituter(Pattern.Algorithm)
+    substituter = Substituter()
 
     # 初始化搜索器
     searcher = Searcher(validator, substituter)

@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List, Tuple
-from config import Pattern, AlgoType, ArgAblation
+from config import Pattern, AlgoType, ArgFragileType
 
 from common.model import HuggingFaceWrapper
 from common.entity import SememicUnit, SememicState, TokenStyle, AdvText, DecisionInfo
@@ -50,15 +50,22 @@ class Validator:
         按不同的策略
     '''
     def operate_fragile(self, substitute: SememicUnit, adv_text: AdvText):
+        if Pattern.Fragile_Type:
+            if Pattern.Fragile_Type == ArgFragileType.DS:
+                self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
+            elif Pattern.Fragile_Type == ArgFragileType.ADS:
+                tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
+                self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+            elif Pattern.Fragile_Type == ArgFragileType.ADAS:
+                tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
+                self.__fragile_measurer.operate_adas_fragile(substitute, adv_text)
+            return
+
         if Pattern.Algorithm == AlgoType.CWordAttacker:
             self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
         elif Pattern.Algorithm == AlgoType.SWordFooler:                
-            if Pattern.Ablation_Type == ArgAblation.Fragile_DS:
-                self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
-                tools.show_log(f'compute fragile by DS, fragile_score = {substitute.fragile_score}')
-            else:
-                self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
-                tools.show_log(f'compute ADS fragile, fragile_score = {substitute.fragile_score}')
+            self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
+            tools.show_log(f'compute ADS fragile, fragile_score = {substitute.fragile_score}')
         else:
             self.__fragile_measurer.operate_adas_fragile(substitute, adv_text)
             tools.show_log(f'compute ADAS fragile, fragile_score = {substitute.fragile_score}')

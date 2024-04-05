@@ -82,43 +82,86 @@ class ArgSubstituteSize:
 
     Default = None
 
+class ArgSubstituteType:
+    NAME = '--subtype'
+
+    HowNet = 'hownet'
+    MLM = 'mlm'
+    Hybrid = 'hybrid'
+
+
+    Default = None
+
+
 class ArgSpaceSize:
     NAME = '--spacesize'
 
     Default = None
 
+class ArgSpaceStyle:
+    NAME = '--spacestyle'
+
+    Single = 'single'
+    Capital = 'capital'
+    Alternate = 'alternate'
+    Full = 'full'
+
+    Default = None
+
+
+class ArgFragileType:
+    NAME = '--fragtype'
+
+    DS = 'ds'
+    ADS = 'ads'
+    ADAS = 'adas'
+
+    Default = None
+
+class ArgHownetSimThreshold:
+    NAME = '--hsimthreshold'
+
+    Default = None
+
+class ArgMaskedSimThreshold:
+    NAME = '--msimthreshold'
+
+    Default = None 
 
 
 '''
 运行模式和元信息
 '''
 class Pattern:
+
     Algorithm:AlgoType = None
     IsTargetAttack = False
     Target_Label:int = None
 
-    Ablation_Type:int = None
     Substitute_Volume:int = 35
-    Postfix:str = None
+    Substitute_Type:str = None
+    Fragile_Type:str = None
+
     # 领域宽度
     Space_Width = 2
     # 领域深度
-    Space_Depth = 35
+    Space_Depth = Substitute_Volume
+    Space_Style:str = None
+    
+    # Hownet词的相似性下界
+    Hownet_Similarity_Threshold  = 0.6
+    # MLM词的相似性下界
+    Masked_Similarity_Threshold  = 0.2
 
+
+
+    Ablation_Type:int = None
+    Postfix:str = None
+   
     IsDebug = True #是否调试
     Masked_Bert = 'google-bert/bert-base-chinese'
     SentenceSimilarityModel = 'shibing624/text2vec-base-chinese-sentence'
     # CWordAttacker算法扰动比例上限
     CWordAttacker_Perturbation_Threshold = 0.2
-    
-    # 句子相似性
-    Sentence_Similarity_Threshold = 0.95
-    # 同义词和原始词的相似性上限
-    Word_Similarity_Threshold  = 0.6
-
-    Masked_Similarity_Threshold  = 0.2
-
-   
-    
 
 

@@ -8,12 +8,14 @@ from .token_unit import SememicUnit, SememicState
 '''
 class SpaceUnit(BaseEntity):
 
-    def __init__(self, columns: List[SememicUnit], column_size) -> None:
+    def __init__(self, columns: List[SememicUnit], width, depth) -> None:
         super().__init__()
 
         self.columns:List[SememicUnit] = [column for column in columns]
+        self.width = width
+        self.depth = depth
 
-        self.exchange_word_indexs:List[int] = [None] * column_size
+        self.exchange_word_indexs:List[int] = [None] * width
         self.exchange_max_decision_score = -1
         self.exchange_max_decision_info = DecisionInfo()
 
