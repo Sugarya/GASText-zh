@@ -61,12 +61,12 @@ def parse_args():
 
     parser.add_argument(ArgHownetSimThreshold.NAME,
                            default = ArgHownetSimThreshold.Default,
-                           type = int,
+                           type = float,
                            help = "the threshold of hownet word similary")
     
     parser.add_argument(ArgMaskedSimThreshold.NAME,
                            default = ArgMaskedSimThreshold.Default,
-                           type = int,
+                           type = float,
                            help = "the threshold of word similary in masked language model")
 
 
