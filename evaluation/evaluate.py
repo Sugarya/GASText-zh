@@ -90,6 +90,7 @@ class Evaluator():
 
         self.__evaluation_result.target_attack = Pattern.IsTargetAttack
         self.__evaluation_result.target_label = Pattern.Target_Label
+        self.__evaluation_result.memo = f'{ArgumentDict}'
 
         self.__persist_to_file()
 
