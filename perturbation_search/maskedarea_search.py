@@ -71,12 +71,17 @@ class MaskedAreaSearch:
                         sequence[i] = Pattern.Space_Width
             elif Pattern.Space_Style == ArgSpaceStyle.Full:
                 tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
-                sequence = [Pattern.Space_Width for s in range(math.ceil(size / 2))]  
+                sequence = [Pattern.Space_Width for s in range(math.ceil(size / 2))] 
+            else:
+                tools.show_log(f'Now, its runing via {Pattern.Space_Style}')
+                sequence = [Pattern.Space_Width]
+                if size >= 3:
+                    sequence.extend([1 for s in range(size - 2)])        
             return sequence
         
         sequence = [Pattern.Space_Width]
         if size >= 3:
-            sequence.extend([1 for s in range(size - 2)])        
+            sequence.extend([1 for s in range(size - 1)])        
 
         return sequence
 
