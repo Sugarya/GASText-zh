@@ -53,18 +53,8 @@ class ArgAlgorithm:
 
     Default = MaskedAreaFooler
 
-
 class ArgLabel:
     NAME = '--label'
-
-    Default = None
-
-class ArgAblation:
-    NAME = '--ablation'
-
-    Fragile_DS = 1 # 脆弱值计算
-    Deletion = 2 # 消去删除扰动
-    Substitute_Via_Others = 3 # 替换动作
 
     Default = None
 
@@ -77,6 +67,11 @@ class ArgPostfix:
 
     Default = None
 
+class ArgSubstituteAddition:
+    NAME = '--subproperty'
+    Deletion = 'delete' # 增加删除原始词扰动
+
+    Default = None
 class ArgSubstituteSize:
     NAME = '--subsize'
 
@@ -85,6 +80,7 @@ class ArgSubstituteSize:
 class ArgSubstituteType:
     NAME = '--subtype'
 
+    CWord = 'cword'
     HowNet = 'hownet'
     MLM = 'mlm'
     Hybrid = 'hybrid'
@@ -109,7 +105,7 @@ class ArgSpaceStyle:
     Default = None
 
 
-class ArgFragileType:
+class ArgFragileMethod:
     NAME = '--fragtype'
 
     DS = 'ds'
@@ -140,6 +136,7 @@ class Pattern:
 
     Substitute_Volume:int = 35
     Substitute_Type:str = None
+    substitute_addition_property:str = None
     Fragile_Type:str = None
 
     # 领域宽度
@@ -153,9 +150,6 @@ class Pattern:
     # MLM词的相似性下界
     Masked_Similarity_Threshold  = 0.2
 
-
-
-    Ablation_Type:int = None
     Postfix:str = None
    
     IsDebug = True #是否调试

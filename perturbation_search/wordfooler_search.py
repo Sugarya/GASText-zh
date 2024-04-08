@@ -2,7 +2,7 @@ from typing import List
 from common import SememicUnit, AdvText, tools, SememicState, AdversaryInfo
 from validation import Validator
 from substitution import Substituter
-from config import Pattern, AlgoType, ArgAblation
+from config import Pattern, AlgoType, ArgSubstituteAddition, ArgSubstituteType
 
 class WordFoolerSearch:
 
@@ -22,21 +22,13 @@ class WordFoolerSearch:
             
             # 2）生成替代词
             origin_word, origin_pos = substitute_unit.origin_word, substitute_unit.origin_pos
-            tools.show_log(f'***** Ablation_Type = {Pattern.Ablation_Type}, origin_word = {origin_word} -> pos = {origin_pos}')
-            if Pattern.Ablation_Type == ArgAblation.Substitute_Via_Others:
-                substitute_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
-            else:
-                substitute_unit.candicates = self.__substituter.generate_hownet_synonyms(origin_word, origin_pos)
+            tools.show_log(f'***** origin_word = {origin_word} -> pos = {origin_pos}')
+            substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
             
             # 没有同义词集
-            if not Pattern.Ablation_Type or Pattern.Ablation_Type == ArgAblation.Fragile_DS:
-                if len(substitute_unit.candicates) <= 2:
-                    tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
-                    continue
-            elif Pattern.Ablation_Type == ArgAblation.Deletion or Pattern.Ablation_Type == ArgAblation.Maintain:
-                if len(substitute_unit.candicates) <= 1:
-                    tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
-                    continue
+            if len(substitute_unit.candicates) <= 1:
+                tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
+                continue
             
             # 3）遍历语义词，决策值累加搜索
             tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.decision_score}')

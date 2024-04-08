@@ -2,7 +2,7 @@ from typing import List
 from OpenHowNet import HowNetDict
 
 from common import tools
-from config import Pattern, ArgAblation
+from config import Pattern, ArgSubstituteAddition
 
 
 class LANGUAGE:
@@ -20,13 +20,13 @@ class BabelNetBuilder:
 
     def synonyms(self, word:str, pos:str):
         candidate_list = self.__synonyms(word, pos)
-        if Pattern.Ablation_Type != ArgAblation.Deletion:
+        if Pattern.substitute_addition_property == ArgSubstituteAddition.Deletion:
             candidate_list.append('')
 
         if Pattern.Substitute_Volume and len(candidate_list) > Pattern.Substitute_Volume:
             candidate_list = candidate_list[:Pattern.Substitute_Volume]
 
-        tools.show_log(f'Pattern.Ablation_Type = {Pattern.Ablation_Type}, Substitute_Size = {Pattern.Substitute_Volume} ｜ candidate_list of {word}-{pos} = {candidate_list}')    
+        tools.show_log(f'Pattern.Ablation_Type = {Pattern.substitute_addition_property}, Substitute_Size = {Pattern.Substitute_Volume} ｜ candidate_list of {word}-{pos} = {candidate_list}')    
         return candidate_list
 
     '''

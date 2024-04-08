@@ -29,7 +29,10 @@ class Substituter:
         tools.show_log(f'Substituter origin word = {origin_word}, pos = {origin_pos}')
 
         if Pattern.Substitute_Type:
-            if Pattern.Substitute_Type == ArgSubstituteType.HowNet:
+            if Pattern.Substitute_Type == ArgSubstituteType.CWord:
+                tools.show_log(f'Now, its runing via {Pattern.Substitute_Type}')
+                result = self.generate_cwordattacker_candidates(origin_word)
+            elif Pattern.Substitute_Type == ArgSubstituteType.HowNet:
                 tools.show_log(f'Now, its runing via {Pattern.Substitute_Type}')
                 result = self.generate_hownet_synonyms(origin_word, origin_pos)
             elif Pattern.Substitute_Type == ArgSubstituteType.MLM:
@@ -41,7 +44,7 @@ class Substituter:
             return result
 
         if Pattern.Algorithm == AlgoType.CWordAttacker:
-            result = self.generate_cwordattacker_candidate(origin_word)
+            result = self.generate_cwordattacker_candidates(origin_word)
         elif Pattern.Algorithm == AlgoType.SWordFooler:
             result = self.generate_hownet_synonyms(origin_word, origin_pos)
         elif Pattern.Algorithm == AlgoType.MaskedAreaFooler:
@@ -49,7 +52,7 @@ class Substituter:
         return result
     
     
-    def generate_cwordattacker_candidate(self, word:str) -> List[str]:
+    def generate_cwordattacker_candidates(self, word:str) -> List[str]:
         candidate_word = self.__attacker_transformer.candidate(word)
         return [candidate_word]
 

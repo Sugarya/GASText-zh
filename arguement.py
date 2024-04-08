@@ -1,5 +1,5 @@
 import argparse
-from config import ArgStyle, ArgAlgorithm, ArgLabel, ArgAblation, ArgSubstituteSize, ArgPostfix, ArgSpaceSize, ArgSpaceStyle, ArgFragileType, ArgSubstituteType, ArgMaskedSimThreshold, ArgHownetSimThreshold
+from config import ArgStyle, ArgAlgorithm, ArgLabel, ArgSubstituteAddition, ArgSubstituteSize, ArgPostfix, ArgSpaceSize, ArgSpaceStyle, ArgFragileMethod, ArgSubstituteType, ArgMaskedSimThreshold, ArgHownetSimThreshold
 
 
 ArgumentDict = {}
@@ -24,15 +24,15 @@ def parse_args():
                            type = int,
                            help = "target label")
     
-    parser.add_argument(ArgAblation.NAME,
-                           default = ArgAblation.Default,
-                           type = int,
-                           help = "ablation type")
-    
     parser.add_argument(ArgPostfix.NAME,
                            default = ArgPostfix.Default,
                            type = str,
                            help = "the postfix of dataset file")
+    
+    parser.add_argument(ArgSubstituteAddition.NAME,
+                           default = ArgSubstituteAddition.Default,
+                           type = str,
+                           help = "substitute addition property")
     
     parser.add_argument(ArgSubstituteSize.NAME,
                            default = ArgSubstituteSize.Default,
@@ -54,8 +54,8 @@ def parse_args():
                            type = str,
                            help = "the style of space")
     
-    parser.add_argument(ArgFragileType.NAME,
-                           default = ArgFragileType.Default,
+    parser.add_argument(ArgFragileMethod.NAME,
+                           default = ArgFragileMethod.Default,
                            type = str,
                            help = "the type of fragile computing")   
 

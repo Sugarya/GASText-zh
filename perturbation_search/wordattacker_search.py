@@ -30,7 +30,7 @@ class WordAttackerGreedy:
             
             # 2）生成替代词
             origin_word = substitute_unit.origin_word
-            substitute_unit.candicates = self.__substituter.generate_cwordattacker_candidate(origin_word)
+            substitute_unit.candicates = self.__substituter.generate_cwordattacker_candidates(origin_word)
             # 没有同义词集
             if not substitute_unit.candicates:
                 tools.show_log(f'*****跳过{origin_word}，其同义词为空')

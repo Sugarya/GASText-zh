@@ -1,6 +1,6 @@
 import numpy as np
 from typing import List, Tuple
-from config import Pattern, AlgoType, ArgFragileType
+from config import Pattern, AlgoType, ArgFragileMethod
 
 from common.model import HuggingFaceWrapper
 from common.entity import SememicUnit, SememicState, TokenStyle, AdvText, DecisionInfo
@@ -51,13 +51,13 @@ class Validator:
     '''
     def operate_fragile(self, substitute: SememicUnit, adv_text: AdvText):
         if Pattern.Fragile_Type:
-            if Pattern.Fragile_Type == ArgFragileType.DS:
+            if Pattern.Fragile_Type == ArgFragileMethod.DS:
                 tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
                 self.__fragile_measurer.operate_ds_fragile(substitute, adv_text)
-            elif Pattern.Fragile_Type == ArgFragileType.ADS:
+            elif Pattern.Fragile_Type == ArgFragileMethod.ADS:
                 tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
                 self.__fragile_measurer.operate_ads_fragile(substitute, adv_text)
-            elif Pattern.Fragile_Type == ArgFragileType.ADAS:
+            elif Pattern.Fragile_Type == ArgFragileMethod.ADAS:
                 tools.show_log(f'Now its computing via {Pattern.Fragile_Type}')
                 self.__fragile_measurer.operate_adas_fragile(substitute, adv_text)
             return

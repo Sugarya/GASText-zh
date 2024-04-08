@@ -135,13 +135,13 @@ def setup_from_args(args):
         Pattern.Target_Label = args.label
         show_log(f'setup_from_args | IsTargetAttack={Pattern.IsTargetAttack} --> {Pattern.Target_Label}')    
 
-    if args.ablation:
-        Pattern.Ablation_Type = args.ablation
-        show_log(f'setup_from_args | ablation = {Pattern.Ablation_Type}')
-
     if args.postfix:
         Pattern.Postfix = args.postfix
         show_log(f'setup_from_args | postfix = {Pattern.Postfix}')
+    
+    if args.subproperty:
+        Pattern.substitute_addition_property = args.subproperty
+        show_log(f'setup_from_args | subproperty = {Pattern.substitute_addition_property}')    
 
     if args.subsize:
         Pattern.Substitute_Volume = args.subsize
