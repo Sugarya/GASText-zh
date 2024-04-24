@@ -26,9 +26,10 @@ class WordFoolerSearch:
             substitute_unit.candicates = self.__substituter.generate(substitute_unit, adv_text)
             
             # 没有同义词集
-            if len(substitute_unit.candicates) <= 1:
-                tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
-                continue
+            if Pattern.Substitute_Type != ArgSubstituteType.CWord:
+                if len(substitute_unit.candicates) <= 1:
+                    tools.show_log(f'*****跳过{substitute_unit.origin_word}，其同义词为空')
+                    continue
             
             # 3）遍历语义词，决策值累加搜索
             tools.show_log(f'*****substitute- {index} -Round, greedy_score = {adv_text.decision_score}')
