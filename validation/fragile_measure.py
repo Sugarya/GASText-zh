@@ -44,15 +44,15 @@ class FragileMeasurer:
         substitute.state = SememicState.WORD_INITIAL
 
         probs = self.__victim_model.output_probs(updated_text)
-        substitute.fragile_score = self.__compute_ads_score(adv_text.origin_probs, probs)
+        substitute.fragile_score = self.__compute_ads_score(adv_text.origin_probs, probs, adv_text.origin_label)
         
 
     # 脆弱性代表偏离原位置的幅度，所以只关注幅度，不关注方向
-    def __compute_ads_score(self, origin_probs: List[float], probs: List[float]) -> float:
+    def __compute_ads_score(self, origin_probs: List[float], probs: List[float], origin_label) -> float:
         result_score = 0
         if Pattern.IsTargetAttack:
             target_label = Pattern.Target_Label
-            result_score = abs(probs[target_label] - origin_probs[target_label]) + abs(probs[target_label] - origin_probs[target_label])
+            result_score = abs(probs[target_label] - origin_probs[target_label]) + abs(origin_probs[origin_label] - probs[origin_label])
         else:
             result_score = np.sum(np.abs(probs - origin_probs))
         return result_score
