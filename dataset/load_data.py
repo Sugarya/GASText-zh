@@ -9,7 +9,7 @@ class DataLoader():
         current_dir = os.path.dirname(os.path.abspath(__file__))
         data_file_name = f'{ArgStyle.Dataset_File_Name[style_name]}'
         if Pattern.Postfix:
-            data_file_name = f'{data_file_name}_{Pattern.Postfix}'
+            data_file_name = f'{data_file_name}{Pattern.Postfix}'
         file_path = f'{current_dir}/src/{data_file_name}.csv'
         tools.show_log(f'Postfix = {Pattern.Postfix} | file_path = {file_path}')
 
